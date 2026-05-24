@@ -15,7 +15,6 @@
   --forest:       #2d5a27;
   --forest-mid:   #3d7031;
   --lime:         #7cb342;
-  --lime-mid:     #8bc34a;
   --lime-light:   #f1f8e9;
   --lime-pale:    #f8fcf4;
   --amber:        #f9a825;
@@ -49,39 +48,54 @@ a { color: inherit; text-decoration: none; }
 .page.active { display: block; }
 
 /* ─ ヘッダー ─ */
-.header {
-  position: sticky; top: 0; z-index: 100;
-  background: var(--forest); padding: 10px 16px;
-  display: flex; align-items: center; gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.header-logo  { font-size: 28px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+.header { position: sticky; top: 0; z-index: 100; background: var(--forest); padding: 10px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.header-logo  { font-size: 28px; line-height: 1; flex-shrink: 0; }
 .header-text  { flex: 1; min-width: 0; }
 .header-title { font-size: 16px; font-weight: 900; color: #fff; font-family: var(--font-display); }
 .header-sub   { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; }
-.header-count { font-size: 11px; color: var(--lime-mid); font-family: var(--font-mono); }
+.header-count { font-size: 11px; color: #aed581; font-family: var(--font-mono); }
 
-/* ─ ボトムナビ ─ */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  background: var(--white); border-top: 2px solid var(--line);
-  display: flex; justify-content: space-around;
-  padding: 6px 0 env(safe-area-inset-bottom, 6px);
-  box-shadow: 0 -2px 12px rgba(45,90,39,0.08);
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 20px; color: var(--ink-muted); font-size: 10px; font-weight: 500; cursor: pointer; transition: color 0.15s; }
+/* ─ ボトムナビ（5項目対応） ─ */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: var(--white); border-top: 2px solid var(--line); display: flex; justify-content: space-around; padding: 6px 0 env(safe-area-inset-bottom,6px); box-shadow: 0 -2px 12px rgba(45,90,39,0.08); }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 10px; color: var(--ink-muted); font-size: 9px; font-weight: 500; cursor: pointer; transition: color 0.15s; min-width: 0; }
 .nav-item.active { color: var(--forest); }
-.nav-icon { font-size: 20px; line-height: 1; }
+.nav-icon { font-size: 18px; line-height: 1; }
+
+/* ─ あいうえお順ページ ─ */
+.kana-title { font-size: 16px; font-weight: 900; font-family: var(--font-display); color: var(--forest); margin: 14px 0 12px; text-align: center; }
+.kana-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-bottom: 8px; }
+.kana-btn {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; border-radius: 8px;
+  background: var(--white); border: 1.5px solid var(--line); color: var(--forest);
+  cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+}
+.kana-btn:hover  { background: var(--lime-light); border-color: var(--lime); }
+.kana-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+.kana-btn.empty  { background: transparent; border-color: transparent; cursor: default; }
+.eisuu-btn {
+  width: 100%; padding: 10px; margin-bottom: 12px;
+  font-size: 13px; font-weight: 700; border-radius: var(--radius-sm);
+  background: var(--white); border: 1.5px solid var(--line); color: var(--forest);
+  cursor: pointer; transition: all 0.15s;
+}
+.eisuu-btn:hover  { background: var(--lime-light); border-color: var(--lime); }
+.eisuu-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+.kana-result-title { font-size: 13px; font-weight: 700; color: var(--forest); margin: 12px 0 8px; }
+.kana-table { width: 100%; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.kana-table-head { display: flex; background: var(--forest); padding: 8px 14px; }
+.kana-table-head span { font-size: 12px; font-weight: 700; color: #fff; }
+.kana-table-head span:first-child { flex: 1; }
+.kana-table-head span:last-child  { width: 140px; }
+.kana-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.12s; }
+.kana-row:last-child { border-bottom: none; }
+.kana-row:hover { background: var(--lime-pale); }
+.kana-row-word { flex: 1; font-size: 15px; font-weight: 700; font-family: var(--font-display); color: var(--forest); }
+.kana-row-read { width: 140px; font-size: 12px; color: var(--ink-muted); font-family: var(--font-mono); }
 
 /* ─ 検索 ─ */
 .search-wrap { position: relative; margin: 12px 0 0; }
-.search-input {
-  width: 100%; padding: 11px 38px 11px 40px;
-  border: 2px solid var(--line); border-radius: var(--radius);
-  background: var(--white); font-size: 15px; color: var(--ink);
-  outline: none; box-shadow: var(--shadow);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
+.search-input { width: 100%; padding: 11px 38px 11px 40px; border: 2px solid var(--line); border-radius: var(--radius); background: var(--white); font-size: 15px; color: var(--ink); outline: none; box-shadow: var(--shadow); transition: border-color 0.15s, box-shadow 0.15s; }
 .search-input:focus { border-color: var(--lime); box-shadow: 0 0 0 3px rgba(124,179,66,0.15), var(--shadow); }
 .search-icon  { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); pointer-events: none; font-size: 16px; }
 .search-clear { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); padding: 4px; font-size: 14px; display: none; }
@@ -91,69 +105,69 @@ a { color: inherit; text-decoration: none; }
 .cache-bar-clear { margin-left: auto; padding: 3px 9px; font-size: 11px; font-weight: 700; border: 1.5px solid var(--amber); border-radius: 4px; color: #78350f; transition: background 0.15s; }
 .cache-bar-clear:hover { background: var(--amber); color: #fff; }
 
-.result-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--ink-muted); margin: 10px 0 8px; flex-wrap: wrap; gap: 4px; }
+.result-meta { font-size: 12px; color: var(--ink-muted); margin: 10px 0 6px; }
 .result-meta strong { color: var(--forest); font-family: var(--font-mono); }
 
-/* ─ カード ─ */
-.card-list { display: flex; flex-direction: column; gap: 6px; }
-.word-card {
-  background: var(--white); border: 1.5px solid var(--line); border-left: 4px solid transparent;
-  border-radius: var(--radius); padding: 12px 14px 12px 12px;
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
-  box-shadow: var(--shadow); transition: border-color 0.15s, box-shadow 0.12s, transform 0.12s;
-}
-.word-card:hover { border-left-color: var(--lime); box-shadow: var(--shadow-md); transform: translateY(-1px); }
-.card-main    { flex: 1; min-width: 0; }
-.card-word    { font-size: 18px; font-weight: 900; font-family: var(--font-display); line-height: 1.2; }
-.card-reading { font-size: 12px; color: var(--ink-muted); margin-top: 2px; font-family: var(--font-mono); letter-spacing: 0.03em; }
-.card-meta    { display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
-.card-source  { font-size: 11px; color: var(--forest-mid); font-weight: 600; }
-.cefr-pill    { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--lime-light); color: var(--forest); font-family: var(--font-mono); border: 1px solid var(--line); }
-.card-fav     { font-size: 20px; color: var(--line); transition: color 0.15s, transform 0.12s; flex-shrink: 0; }
-.card-fav:hover { transform: scale(1.2); }
-.card-fav.active { color: var(--amber); }
+/* ─ 検索初期状態 ─ */
+.search-empty { text-align: center; padding: 60px 16px; color: var(--ink-muted); font-size: 14px; line-height: 2; }
+.search-empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+
+/* ─ 結果リスト（フラット行） ─ */
+.result-list { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.result-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.12s; gap: 10px; }
+.result-row:last-child { border-bottom: none; }
+.result-row:hover { background: var(--lime-pale); }
+.row-word-wrap { flex: 0 0 auto; min-width: 60px; }
+.row-word    { font-size: 16px; font-weight: 900; font-family: var(--font-display); display: block; }
+.row-reading { font-size: 11px; color: var(--ink-muted); font-family: var(--font-mono); display: block; margin-top: 1px; }
+.row-src  { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-mid); font-weight: 600; min-width: 0; }
+.row-src-icon { font-size: 13px; flex-shrink: 0; }
+.row-src-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-fav  { font-size: 18px; color: var(--line); transition: color 0.15s, transform 0.12s; flex-shrink: 0; padding: 4px; }
+.row-fav:hover  { transform: scale(1.2); }
+.row-fav.active { color: var(--amber); }
 
 /* ─ ページネーション ─ */
-.pagination { display: none; justify-content: center; align-items: center; gap: 12px; margin: 20px 0 8px; flex-wrap: wrap; }
+.pagination { display: none; justify-content: center; align-items: center; gap: 12px; margin: 16px 0 8px; }
 .pagination.show { display: flex; }
 .btn-page { padding: 8px 18px; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; color: var(--forest); transition: all 0.15s; }
 .btn-page:hover:not(:disabled) { background: var(--forest); color: #fff; border-color: var(--forest); }
 .btn-page:disabled { opacity: 0.35; cursor: not-allowed; }
 .page-info { font-size: 12px; font-family: var(--font-mono); color: var(--ink-muted); min-width: 60px; text-align: center; }
 
-/* ─ 詳細シート ─ */
+/* ─ ミニシート ─ */
 .overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(26,46,26,0.55); backdrop-filter: blur(3px); align-items: flex-end; }
 .overlay.open { display: flex; }
-.sheet { background: var(--white); border-radius: 20px 20px 0 0; width: 100%; max-width: 680px; margin: 0 auto; max-height: 88vh; overflow-y: auto; padding: 18px 18px 36px; animation: slideUp 0.26s cubic-bezier(0.32,0.72,0,1); }
+.sheet { background: var(--white); border-radius: 20px 20px 0 0; width: 100%; max-width: 680px; margin: 0 auto; max-height: 85vh; overflow-y: auto; padding: 18px 18px 36px; animation: slideUp 0.26s cubic-bezier(0.32,0.72,0,1); }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .sheet-handle { width: 40px; height: 4px; background: var(--line); border-radius: 2px; margin: 0 auto 16px; }
 .sheet-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
 .sheet-word    { font-size: 32px; font-weight: 900; font-family: var(--font-display); line-height: 1.1; color: var(--forest); }
 .sheet-reading { font-size: 13px; color: var(--ink-muted); font-family: var(--font-mono); margin-top: 4px; letter-spacing: 0.04em; }
 .sheet-pills   { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-.sheet-close   { width: 30px; height: 30px; border-radius: 50%; background: var(--bg); color: var(--ink-mid); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; transition: background 0.15s; }
+.pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--lime-light); color: var(--forest); font-family: var(--font-mono); border: 1px solid var(--line); }
+.pill.cat { background: var(--lime-pale); color: var(--forest-mid); }
+.sheet-close { width: 30px; height: 30px; border-radius: 50%; background: var(--bg); color: var(--ink-mid); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; transition: background 0.15s; }
 .sheet-close:hover { background: var(--line); }
 
-.link-section { margin-bottom: 16px; }
-.link-section-title { font-size: 11px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.link-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; margin-bottom: 7px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--forest); background: var(--lime-light); transition: border-color 0.15s, background 0.15s, transform 0.1s; text-decoration: none; }
-.link-btn:hover { border-color: var(--lime); background: var(--white); transform: translateY(-1px); box-shadow: var(--shadow); }
-.link-btn-icon  { font-size: 16px; flex-shrink: 0; }
-.link-btn-label { flex: 1; }
-.link-btn-arrow { color: var(--lime); font-size: 14px; }
-.link-btn.ext   { background: var(--amber-light); border-color: #f3d48a; color: #7a5000; }
-.link-btn.ext:hover { border-color: var(--amber); }
+.sheet-link-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 16px; border: 2px solid var(--lime); border-radius: var(--radius); font-size: 14px; font-weight: 700; color: var(--forest); background: var(--lime-light); margin-bottom: 14px; text-decoration: none; transition: background 0.15s, transform 0.1s; }
+.sheet-link-btn:hover { background: var(--white); transform: translateY(-1px); box-shadow: var(--shadow); }
+.sheet-link-btn.ext { background: var(--amber-light); border-color: var(--amber); color: #7a5000; }
+.sheet-link-btn.ext:hover { background: var(--white); }
+.sheet-link-icon  { font-size: 18px; }
+.sheet-link-label { flex: 1; }
+.sheet-link-arrow { font-size: 16px; color: var(--lime); }
+.sheet-link-btn.ext .sheet-link-arrow { color: var(--amber); }
 
-.sheet-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-.act-btn { flex: 1; min-width: 110px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; border: 1.5px solid var(--line); background: var(--white); color: var(--ink-mid); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.act-btn:hover { border-color: var(--ink-muted); }
+.sheet-actions { display: flex; gap: 8px; }
+.act-btn { flex: 1; padding: 11px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; border: 1.5px solid var(--line); background: var(--white); color: var(--ink-mid); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .act-btn.fav-on  { border-color: var(--amber); color: var(--amber); background: var(--amber-light); }
 .act-btn.done-on { border-color: var(--teal);  color: var(--teal);  background: var(--teal-light);  }
 
-.sheet-note { font-size: 13px; color: var(--ink-mid); line-height: 1.7; background: var(--lime-pale); border-left: 3px solid var(--lime-mid); padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-top: 14px; }
+.sheet-note { font-size: 13px; color: var(--ink-mid); line-height: 1.7; background: var(--lime-pale); border-left: 3px solid #aed581; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-top: 14px; }
 
 /* ─ お気に入り・学習記録 ─ */
-.page-title { font-size: 20px; font-weight: 900; font-family: var(--font-display); margin: 14px 0 14px; color: var(--forest); }
+.page-title { font-size: 20px; font-weight: 900; font-family: var(--font-display); margin: 14px 0; color: var(--forest); }
 .empty-state { text-align: center; padding: 48px 16px; color: var(--ink-muted); font-size: 14px; line-height: 1.9; }
 .empty-icon  { font-size: 44px; display: block; margin-bottom: 12px; }
 .stat-row  { display: flex; gap: 10px; margin-bottom: 16px; }
@@ -176,18 +190,17 @@ a { color: inherit; text-decoration: none; }
 textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .form-row { display: flex; gap: 8px; }
 .form-row .form-group { flex: 1; }
-.submit-btn { width: 100%; padding: 12px; margin-top: 4px; background: var(--forest); color: #fff; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; transition: background 0.15s, transform 0.1s; }
+.submit-btn { width: 100%; padding: 12px; background: var(--forest); color: #fff; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; transition: background 0.15s; margin-top: 4px; }
 .submit-btn:hover { background: var(--forest-mid); }
-.submit-btn:active { transform: scale(0.98); }
+.edit-result-list { max-height: 300px; overflow-y: auto; }
 .edit-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); margin-bottom: 6px; }
 .edit-word { font-size: 14px; font-weight: 700; font-family: var(--font-display); }
 .edit-src  { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
 .edit-btns { display: flex; gap: 6px; }
-.edit-btn  { font-size: 12px; padding: 5px 11px; border: 1.5px solid var(--line); border-radius: 6px; color: var(--ink-mid); background: var(--white); font-weight: 600; transition: border-color 0.15s, color 0.15s; }
+.edit-btn  { font-size: 12px; padding: 5px 11px; border: 1.5px solid var(--line); border-radius: 6px; color: var(--ink-mid); background: var(--white); font-weight: 600; transition: border-color 0.15s; }
 .edit-btn:hover { border-color: var(--lime); color: var(--forest); }
 .edit-btn.del { border-color: #fecaca; color: var(--red); background: #fff5f5; }
 .edit-btn.del:hover { border-color: var(--red); }
-.edit-result-list { max-height: 300px; overflow-y: auto; }
 
 /* ─ 編集モーダル ─ */
 .modal-bg { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(26,46,26,0.55); backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 20px; }
@@ -197,13 +210,12 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
 .modal-btn { flex: 1; padding: 10px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-mid); }
 .modal-btn.ok { background: var(--forest); color: #fff; border-color: var(--forest); }
-.modal-btn.ok:hover { background: var(--forest-mid); }
 
 /* ─ 共通 ─ */
 .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--forest); color: #fff; font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 24px; opacity: 0; pointer-events: none; z-index: 999; white-space: nowrap; transition: opacity 0.22s; box-shadow: var(--shadow-md); }
 .toast.show { opacity: 1; }
-.loading { text-align: center; padding: 52px 16px; color: var(--ink-muted); font-size: 14px; }
-.spinner { width: 30px; height: 30px; margin: 0 auto 14px; border: 2.5px solid var(--line); border-top-color: var(--lime); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.loading { text-align: center; padding: 40px 16px; color: var(--ink-muted); font-size: 14px; }
+.spinner { width: 28px; height: 28px; margin: 0 auto 12px; border: 2.5px solid var(--line); border-top-color: var(--lime); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -229,21 +241,21 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 <div class="page active" id="page-search">
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
-    <input class="search-input" id="searchInput" type="search" placeholder="単語名・よみ・カテゴリで検索…" autocomplete="off">
+    <input class="search-input" id="searchInput" type="search"
+           placeholder="単語名・よみ（かな・カタカナ）・カテゴリで検索…" autocomplete="off">
     <button class="search-clear" id="searchClear">✕</button>
   </div>
+
   <div class="cache-bar" id="cacheBar">
     <span id="cacheMsg"></span>
     <button class="cache-bar-clear" id="cacheClearBtn">再取得</button>
   </div>
-  <div class="result-meta" id="resultMeta"></div>
-  <div class="card-list" id="cardList">
-    <div class="loading"><div class="spinner"></div>読み込み中…</div>
-  </div>
-  <div class="pagination" id="pagination">
-    <button class="btn-page" id="prevBtn">← 前へ</button>
-    <div class="page-info" id="pageInfo">1 / 1</div>
-    <button class="btn-page" id="nextBtn">次へ →</button>
+
+  <div id="searchArea">
+    <div class="search-empty">
+      <span class="search-empty-icon">🤟</span>
+      単語名・よみ・カテゴリを入力して<br>検索してください
+    </div>
   </div>
 </div>
 
@@ -252,7 +264,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      ═══════════════════════════════════════════════════════════════ -->
 <div class="page" id="page-fav">
   <div class="page-title">⭐ お気に入り</div>
-  <div class="card-list" id="favList"></div>
+  <div id="favList"></div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -294,6 +306,78 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     HTML: あいうえお順ページ
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-aiueo">
+  <div class="kana-title">あいうえお順の手話</div>
+
+  <!-- 五十音グリッド -->
+  <div class="kana-grid" id="kanaGrid">
+    <!-- あ行 -->
+    <button class="kana-btn" data-kana="あ">あ</button>
+    <button class="kana-btn" data-kana="か">か</button>
+    <button class="kana-btn" data-kana="さ">さ</button>
+    <button class="kana-btn" data-kana="た">た</button>
+    <button class="kana-btn" data-kana="な">な</button>
+    <button class="kana-btn" data-kana="は">は</button>
+    <button class="kana-btn" data-kana="ま">ま</button>
+    <button class="kana-btn" data-kana="や">や</button>
+    <button class="kana-btn" data-kana="ら">ら</button>
+    <button class="kana-btn" data-kana="わ">わ</button>
+    <!-- い行 -->
+    <button class="kana-btn" data-kana="い">い</button>
+    <button class="kana-btn" data-kana="き">き</button>
+    <button class="kana-btn" data-kana="し">し</button>
+    <button class="kana-btn" data-kana="ち">ち</button>
+    <button class="kana-btn" data-kana="に">に</button>
+    <button class="kana-btn" data-kana="ひ">ひ</button>
+    <button class="kana-btn" data-kana="み">み</button>
+    <button class="kana-btn empty"></button>
+    <button class="kana-btn" data-kana="り">り</button>
+    <button class="kana-btn" data-kana="を">を</button>
+    <!-- う行 -->
+    <button class="kana-btn" data-kana="う">う</button>
+    <button class="kana-btn" data-kana="く">く</button>
+    <button class="kana-btn" data-kana="す">す</button>
+    <button class="kana-btn" data-kana="つ">つ</button>
+    <button class="kana-btn" data-kana="ぬ">ぬ</button>
+    <button class="kana-btn" data-kana="ふ">ふ</button>
+    <button class="kana-btn" data-kana="む">む</button>
+    <button class="kana-btn" data-kana="ゆ">ゆ</button>
+    <button class="kana-btn" data-kana="る">る</button>
+    <button class="kana-btn" data-kana="ん">ん</button>
+    <!-- え行 -->
+    <button class="kana-btn" data-kana="え">え</button>
+    <button class="kana-btn" data-kana="け">け</button>
+    <button class="kana-btn" data-kana="せ">せ</button>
+    <button class="kana-btn" data-kana="て">て</button>
+    <button class="kana-btn" data-kana="ね">ね</button>
+    <button class="kana-btn" data-kana="へ">へ</button>
+    <button class="kana-btn" data-kana="め">め</button>
+    <button class="kana-btn empty"></button>
+    <button class="kana-btn" data-kana="れ">れ</button>
+    <button class="kana-btn empty"></button>
+    <!-- お行 -->
+    <button class="kana-btn" data-kana="お">お</button>
+    <button class="kana-btn" data-kana="こ">こ</button>
+    <button class="kana-btn" data-kana="そ">そ</button>
+    <button class="kana-btn" data-kana="と">と</button>
+    <button class="kana-btn" data-kana="の">の</button>
+    <button class="kana-btn" data-kana="ほ">ほ</button>
+    <button class="kana-btn" data-kana="も">も</button>
+    <button class="kana-btn" data-kana="よ">よ</button>
+    <button class="kana-btn" data-kana="ろ">ろ</button>
+    <button class="kana-btn empty"></button>
+  </div>
+
+  <!-- 英数ボタン -->
+  <button class="eisuu-btn" id="eisuuBtn">英数（A B C … 1 2 3 …）</button>
+
+  <!-- 結果表示 -->
+  <div id="kanaResults"></div>
+</div>
+
 </div><!-- /.app -->
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -301,13 +385,14 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      ═══════════════════════════════════════════════════════════════ -->
 <nav class="bottom-nav">
   <div class="nav-item active" data-page="search"><div class="nav-icon">🔍</div><div>検索</div></div>
+  <div class="nav-item" data-page="aiueo"><div class="nav-icon">🔤</div><div>あいうえお</div></div>
   <div class="nav-item" data-page="fav"><div class="nav-icon">⭐</div><div>お気に入り</div></div>
-  <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>学習記録</div></div>
+  <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>記録</div></div>
   <div class="nav-item" data-page="admin"><div class="nav-icon">⚙️</div><div>管理</div></div>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     HTML: 詳細シート
+     HTML: ミニシート（動画リンク・お気に入り・学習済み）
      ═══════════════════════════════════════════════════════════════ -->
 <div class="overlay" id="overlay">
   <div class="sheet">
@@ -320,13 +405,14 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
       </div>
       <button class="sheet-close" id="sheetClose">✕</button>
     </div>
-    <div class="link-section">
-      <div class="link-section-title">動画・参考リンク</div>
-      <div id="sheetLinks"></div>
-    </div>
+    <a id="sheetLinkBtn" href="#" target="_blank" rel="noopener" class="sheet-link-btn">
+      <span class="sheet-link-icon" id="sheetLinkIcon">▶</span>
+      <span class="sheet-link-label" id="sheetLinkLabel"></span>
+      <span class="sheet-link-arrow">→</span>
+    </a>
     <div class="sheet-actions">
       <button class="act-btn" id="sheetFavBtn">☆ お気に入り</button>
-      <button class="act-btn" id="sheetDoneBtn">☑ 学習済み</button>
+      <button class="act-btn" id="sheetDoneBtn">☑ 学習済みにする</button>
     </div>
     <div class="sheet-note" id="sheetNote" style="display:none"></div>
   </div>
@@ -356,7 +442,8 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      JS: 設定・定数
      ═══════════════════════════════════════════════════════════════ -->
 <script>
-var GAS_URL  = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
+// ★ 再デプロイ後はこのURLを更新すること
+var GAS_URL   = 'https://script.google.com/macros/s/AKfycbxC_HPWMl3iQE54mHOMEE7TdiTJmp2uh-EXDEsox0HI4gElGF_9xR08uAtTrU4y1cTIzQ/exec';
 var PAGE_SIZE = 50;
 
 var SOURCE_LABELS = {
@@ -370,9 +457,22 @@ var SOURCE_LABELS = {
   'mimisuppo':'mimisuppo','asaka-shakyo':'朝霞社協',
   'accessible-cancer':'アクセシブルながん情報',
   'deaf-highschool':'ろう難聴高校生塾','mede-kiku-tv':'目で聴くテレビ',
-  'newsigns':'NewSigns.jp','nhk-cg':'NHK手話CG','bbed':'BBED'
+  'newsigns':'NewSigns.jp','nhk-cg':'NHK手話CG','bbed':'BBED',
+  'tsukuba_roa':'聾啞教授手話法（筑波）',
+  'tsukuba_kyoto1':'手話Ⅰ（筑波）','tsukuba_kyoto2':'手話Ⅱ（筑波）',
+  'tsukuba_osaka':'手話辞典（筑波）','tsukuba_shiori':'手まねと言葉の栞（筑波）',
+  'tsukuba_kyushu':'九州の手話（筑波）',
+  'tsukuba_cks':'聴覚管理に係る手話（筑波）',
+  'tsukuba_edu':'大学生活に係る手話（筑波）'
 };
-var SOURCE_EXT = { 'newsigns':1,'nhk-cg':1,'bbed':1 };
+
+// 外部リンク（🔗）ソース一覧
+var SOURCE_EXT = {
+  'newsigns':1,'nhk-cg':1,'bbed':1,
+  'tsukuba_roa':1,'tsukuba_kyoto1':1,'tsukuba_kyoto2':1,
+  'tsukuba_osaka':1,'tsukuba_shiori':1,'tsukuba_kyushu':1,
+  'tsukuba_cks':1,'tsukuba_edu':1
+};
 
 // ═══════════════════════════════════════════════════════════════
 //  JS: キャッシュ管理（24時間）
@@ -396,11 +496,11 @@ var Cache = {
 //  JS: 状態管理
 // ═══════════════════════════════════════════════════════════════
 var allWords     = [];
-var filtered     = [];
+var flatRows     = [];   // フィルタ後のフラット行（word×source）
 var categoryList = [];
 var favSet       = new Set(JSON.parse(localStorage.getItem('favs')||'[]'));
 var doneMap      = JSON.parse(localStorage.getItem('done')||'{}');
-var currentWord  = null;
+var currentSheet = null; // ミニシートで開いている行データ
 var currentQuery = '';
 var currentPage  = 1;
 
@@ -408,7 +508,7 @@ var currentPage  = 1;
 //  JS: GAS通信（fetch POST）
 // ═══════════════════════════════════════════════════════════════
 function gasCall(action, args, onSuccess, onError) {
-  var _err = onError || function(e){ showToast('❌ '+(e.message||String(e))); };
+  var _err = onError||function(e){ showToast('❌ '+(e.message||String(e))); };
   fetch(GAS_URL,{
     method:'POST',
     body:JSON.stringify({action:action,args:args||[]}),
@@ -420,49 +520,174 @@ function gasCall(action, args, onSuccess, onError) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  JS: ひらがな→カタカナ変換（検索用）
+// ═══════════════════════════════════════════════════════════════
+function hiraToKata(str) {
+  return String(str).replace(/[\u3041-\u3096]/g, function(ch) {
+    return String.fromCharCode(ch.charCodeAt(0) + 0x60);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  JS: 初期化
 // ═══════════════════════════════════════════════════════════════
 function init() {
-  document.getElementById('cardList').innerHTML =
-    '<div class="loading"><div class="spinner"></div>読み込み中…</div>';
-
+  // カテゴリ一覧（キャッシュ優先）
   var cachedCats = Cache.get(CAT_CACHE_KEY);
   if(cachedCats){ categoryList=cachedCats; buildCategorySelects(); }
   else{ gasCall('getCategoryList',[],function(cats){ categoryList=cats||[]; Cache.set(CAT_CACHE_KEY,categoryList); buildCategorySelects(); }); }
 
+  // 単語一覧（キャッシュ優先）
   var cached = Cache.get(CACHE_KEY);
   if(cached){ showCacheBar(true); onWordsLoaded(cached); }
-  else{ showCacheBar(false); gasCall('getWordList',[],function(data){ Cache.set(CACHE_KEY,data); onWordsLoaded(data); }); }
+  else{
+    showCacheBar(false);
+    gasCall('getWordList',[],function(data){ Cache.set(CACHE_KEY,data); onWordsLoaded(data); });
+  }
 }
 
 function onWordsLoaded(data) {
   allWords = (data||[]).map(function(row,i){
     return {
       _index:   i,
-      word:     row['word（単語名）']            ||'',
-      reading:  row['reading（よみ・カタカナ）']   ||'',
-      source:   row['source（ソース）']           ||'',
-      note:     row['note（補足）']               ||'',
-      cefr:     row['cefr（レベル）']             ||'',
-      category: row['category（カテゴリ）']       ||'',
+      word:     String(row['word（単語名）']           ||''),
+      reading:  String(row['reading（よみ・カタカナ）']  ||''),
+      source:   String(row['source（ソース）']          ||''),
+      note:     String(row['note（補足）']              ||''),
+      cefr:     String(row['cefr（レベル）']            ||''),
+      category: String(row['category（カテゴリ）']      ||''),
       urls:     typeof row.urls==='object'?row.urls:{}
     };
   });
   document.getElementById('headerCount').textContent = allWords.length.toLocaleString()+'語';
-  applyFilter(); updateStats();
+  updateStats();
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  JS: 検索・フィルタ
+//  JS: 検索・フィルタ（ひらがな・カタカナ・漢字混じり対応）
 // ═══════════════════════════════════════════════════════════════
 function applyFilter() {
-  var q = currentQuery.toLowerCase();
-  filtered = !q ? allWords : allWords.filter(function(w){
-    return w.word.includes(q)||w.reading.toLowerCase().includes(q)||w.category.toLowerCase().includes(q);
+  var q     = currentQuery;
+  var qKata = hiraToKata(q); // ひらがなをカタカナに変換して比較
+
+  if(!q) {
+    // 検索前：初期状態を表示
+    document.getElementById('searchArea').innerHTML =
+      '<div class="search-empty"><span class="search-empty-icon">🤟</span>単語名・よみ・カテゴリを入力して<br>検索してください</div>';
+    document.getElementById('pagination').classList.remove('show');
+    return;
+  }
+
+  var filtered = allWords.filter(function(w){
+    return w.word.includes(q) ||
+           hiraToKata(w.reading).includes(qKata) ||  // よみはカタカナ統一で比較
+           w.category.includes(q);
   });
-  currentPage = 1; renderPage();
+
+  // フラット展開（word × source）
+  flatRows = [];
+  filtered.forEach(function(w){
+    var urls = w.urls||{};
+    Object.keys(urls).forEach(function(src){
+      var url = urls[src];
+      if(!url) return;
+      flatRows.push({
+        word:      w.word,
+        reading:   w.reading,
+        cefr:      w.cefr,
+        category:  w.category,
+        note:      w.note,
+        src:       src,
+        url:       url,
+        _wordIndex: w._index
+      });
+    });
+  });
+
+  currentPage = 1;
+  renderPage();
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  JS: 結果描画・ページネーション
+// ═══════════════════════════════════════════════════════════════
+function renderPage() {
+  var total = flatRows.length;
+  var pages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  var start = (currentPage-1)*PAGE_SIZE;
+  var slice = flatRows.slice(start, start+PAGE_SIZE);
+
+  var area = document.getElementById('searchArea');
+  if(!total){
+    area.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>「'+esc(currentQuery)+'」に一致する単語がありませんでした</div>';
+    document.getElementById('pagination').classList.remove('show');
+    return;
+  }
+
+  var meta = '<div class="result-meta"><strong>'+total.toLocaleString()+'</strong> 件（'+currentPage+'/'+pages+'ページ）</div>';
+  var rows = slice.map(rowHTML).join('');
+  area.innerHTML = meta + '<div class="result-list">'+rows+'</div>';
+
+  // イベント登録
+  area.querySelectorAll('.result-row').forEach(function(el){
+    el.addEventListener('click', function(e){
+      if(e.target.classList.contains('row-fav')) return; // ⭐クリックは除外
+      var idx = +el.dataset.idx;
+      openSheet(flatRows[idx]);
+    });
+  });
+  area.querySelectorAll('.row-fav').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var word = btn.dataset.word;
+      favSet.has(word)?favSet.delete(word):favSet.add(word);
+      saveFavs(); updateStats();
+      btn.classList.toggle('active', favSet.has(word));
+      btn.textContent = favSet.has(word)?'⭐':'☆';
+    });
+  });
+
+  // ページネーション
+  var pag = document.getElementById('pagination');
+  if(pages>1){
+    pag.classList.add('show');
+    document.getElementById('pageInfo').textContent = currentPage+' / '+pages;
+    document.getElementById('prevBtn').disabled = currentPage<=1;
+    document.getElementById('nextBtn').disabled = currentPage>=pages;
+  } else { pag.classList.remove('show'); }
+}
+
+function rowHTML(row, idx) {
+  var label  = SOURCE_LABELS[row.src]||row.src;
+  var isExt  = !!SOURCE_EXT[row.src];
+  var icon   = isExt?'🔗':'▶';
+  var isFav  = favSet.has(row.word);
+  return '<div class="result-row" data-idx="'+(flatRows.indexOf(row))+'">'+
+    '<div class="row-word-wrap">'+
+      '<span class="row-word">'+esc(row.word)+'</span>'+
+      '<span class="row-reading">'+esc(row.reading)+'</span>'+
+    '</div>'+
+    '<div class="row-src">'+
+      '<span class="row-src-icon">'+icon+'</span>'+
+      '<span class="row-src-label">'+esc(label)+'</span>'+
+    '</div>'+
+    '<button class="row-fav '+(isFav?'active':'')+'" data-word="'+esc(row.word)+'">'+(isFav?'⭐':'☆')+'</button>'+
+    '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: ページネーションボタン
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('prevBtn').addEventListener('click',function(){
+  if(currentPage>1){currentPage--;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
+});
+document.getElementById('nextBtn').addEventListener('click',function(){
+  if(currentPage<Math.ceil(flatRows.length/PAGE_SIZE)){currentPage++;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: 検索入力
+// ═══════════════════════════════════════════════════════════════
 var searchInput = document.getElementById('searchInput');
 var searchClear = document.getElementById('searchClear');
 searchInput.addEventListener('input', function(){
@@ -476,79 +701,36 @@ searchClear.addEventListener('click', function(){
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  JS: カード描画・ページネーション
+//  JS: ミニシート
 // ═══════════════════════════════════════════════════════════════
-function renderPage() {
-  var total = filtered.length;
-  var pages = Math.max(1,Math.ceil(total/PAGE_SIZE));
-  var start = (currentPage-1)*PAGE_SIZE;
-  var meta  = document.getElementById('resultMeta');
-  meta.innerHTML = currentQuery
-    ? '<strong>'+total.toLocaleString()+'</strong> 件（全'+allWords.length.toLocaleString()+'件中）'
-    : '全 <strong>'+total.toLocaleString()+'</strong> 件';
-  renderCards(filtered.slice(start,start+PAGE_SIZE),'cardList');
-  var pag = document.getElementById('pagination');
-  if(pages>1){
-    pag.classList.add('show');
-    document.getElementById('pageInfo').textContent = currentPage+' / '+pages;
-    document.getElementById('prevBtn').disabled = currentPage<=1;
-    document.getElementById('nextBtn').disabled = currentPage>=pages;
-  } else { pag.classList.remove('show'); }
-}
+function openSheet(row) {
+  currentSheet = row;
+  document.getElementById('sheetWord').textContent    = row.word;
+  document.getElementById('sheetReading').textContent = row.reading;
 
-function renderCards(words, id) {
-  var el = document.getElementById(id);
-  if(!words.length){ el.innerHTML='<div class="empty-state"><span class="empty-icon">🔍</span>該当する単語がありません</div>'; return; }
-  el.innerHTML = words.map(function(w){
-    var src  = SOURCE_LABELS[w.source]||w.source;
-    var isFav= favSet.has(w.word);
-    var cefr = w.cefr?'<span class="cefr-pill">'+esc(w.cefr)+'</span>':'';
-    return '<div class="word-card" data-index="'+w._index+'">'+
-      '<div class="card-main">'+
-        '<div class="card-word">'+esc(w.word)+'</div>'+
-        '<div class="card-reading">'+esc(w.reading)+'</div>'+
-        '<div class="card-meta"><span class="card-source">'+esc(src)+'</span>'+cefr+'</div>'+
-      '</div>'+
-      '<button class="card-fav '+(isFav?'active':'')+'" data-index="'+w._index+'">'+(isFav?'⭐':'☆')+'</button>'+
-      '</div>';
-  }).join('');
-  el.querySelectorAll('.word-card').forEach(function(c){ c.addEventListener('click',function(){ openDetail(allWords[+c.dataset.index]); }); });
-  el.querySelectorAll('.card-fav').forEach(function(btn){ btn.addEventListener('click',function(e){ e.stopPropagation(); toggleFav(+btn.dataset.index,btn); }); });
-}
-
-document.getElementById('prevBtn').addEventListener('click',function(){ if(currentPage>1){currentPage--;renderPage();window.scrollTo({top:0,behavior:'smooth'});} });
-document.getElementById('nextBtn').addEventListener('click',function(){ if(currentPage<Math.ceil(filtered.length/PAGE_SIZE)){currentPage++;renderPage();window.scrollTo({top:0,behavior:'smooth'});} });
-
-// ═══════════════════════════════════════════════════════════════
-//  JS: 詳細シート
-// ═══════════════════════════════════════════════════════════════
-function openDetail(w) {
-  currentWord = w;
-  document.getElementById('sheetWord').textContent    = w.word;
-  document.getElementById('sheetReading').textContent = w.reading;
+  // バッジ
   var pills = '';
-  if(w.cefr)     pills += '<span class="cefr-pill">'+esc(w.cefr)+'</span>';
-  if(w.category) pills += '<span class="cefr-pill" style="background:var(--lime-pale);color:var(--forest-mid)">'+esc(w.category)+'</span>';
+  if(row.cefr)     pills += '<span class="pill">'+esc(row.cefr)+'</span>';
+  if(row.category) pills += '<span class="pill cat">'+esc(row.category)+'</span>';
   document.getElementById('sheetPills').innerHTML = pills;
 
-  var urls = w.urls||{}, html='', keys=Object.keys(urls);
-  if(!keys.length){ html='<div style="font-size:13px;color:var(--ink-muted);padding:8px">リンクが登録されていません</div>'; }
-  else { keys.forEach(function(src){
-    var url=urls[src]; if(!url)return;
-    var label=SOURCE_LABELS[src]||src, isExt=!!SOURCE_EXT[src];
-    html+='<a href="'+esc(url)+'" target="_blank" rel="noopener" class="link-btn'+(isExt?' ext':'')+'">'+
-      '<span class="link-btn-icon">'+(isExt?'🔗':'▶')+'</span>'+
-      '<span class="link-btn-label">'+esc(label)+' で見る</span>'+
-      '<span class="link-btn-arrow">→</span></a>';
-  }); }
-  document.getElementById('sheetLinks').innerHTML = html;
+  // リンクボタン
+  var label  = SOURCE_LABELS[row.src]||row.src;
+  var isExt  = !!SOURCE_EXT[row.src];
+  var linkBtn = document.getElementById('sheetLinkBtn');
+  document.getElementById('sheetLinkIcon').textContent  = isExt?'🔗':'▶';
+  document.getElementById('sheetLinkLabel').textContent = label+' で見る';
+  linkBtn.href = row.url;
+  linkBtn.className = 'sheet-link-btn'+(isExt?' ext':'');
 
+  // 補足
   var noteEl = document.getElementById('sheetNote');
-  if(w.note){ noteEl.textContent=w.note; noteEl.style.display='block'; } else { noteEl.style.display='none'; }
+  if(row.note){noteEl.textContent=row.note;noteEl.style.display='block';}
+  else{noteEl.style.display='none';}
 
-  updateSheetBtns(w.word);
+  updateSheetBtns(row.word);
   document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
 
 function updateSheetBtns(word) {
@@ -556,22 +738,32 @@ function updateSheetBtns(word) {
   var isFav=favSet.has(word), isDone=!!doneMap[word];
   fb.className='act-btn'+(isFav?' fav-on':'');
   db.className='act-btn'+(isDone?' done-on':'');
-  fb.textContent = isFav  ?'⭐ お気に入り済み':'☆ お気に入り';
-  db.textContent = isDone ?'✅ 学習済み'      :'☑ 学習済みにする';
+  fb.textContent = isFav ?'⭐ お気に入り済み':'☆ お気に入り';
+  db.textContent = isDone?'✅ 学習済み'      :'☑ 学習済みにする';
 }
 
-function closeDetail() { document.getElementById('overlay').classList.remove('open'); document.body.style.overflow=''; currentWord=null; }
-document.getElementById('sheetClose').addEventListener('click',closeDetail);
-document.getElementById('overlay').addEventListener('click',function(e){ if(e.target===document.getElementById('overlay'))closeDetail(); });
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow=''; currentSheet=null;
+}
+document.getElementById('sheetClose').addEventListener('click',closeSheet);
+document.getElementById('overlay').addEventListener('click',function(e){
+  if(e.target===document.getElementById('overlay'))closeSheet();
+});
 
 document.getElementById('sheetFavBtn').addEventListener('click',function(){
-  if(!currentWord)return; var word=currentWord.word;
+  if(!currentSheet)return; var word=currentSheet.word;
   favSet.has(word)?favSet.delete(word):favSet.add(word);
   saveFavs(); updateSheetBtns(word); updateStats();
   showToast(favSet.has(word)?'⭐ お気に入りに追加':'お気に入りを解除');
+  // カード行の⭐も更新
+  document.querySelectorAll('.row-fav[data-word="'+esc(word)+'"]').forEach(function(btn){
+    btn.classList.toggle('active',favSet.has(word));
+    btn.textContent=favSet.has(word)?'⭐':'☆';
+  });
 });
 document.getElementById('sheetDoneBtn').addEventListener('click',function(){
-  if(!currentWord)return; var word=currentWord.word;
+  if(!currentSheet)return; var word=currentSheet.word;
   doneMap[word]?delete doneMap[word]:(doneMap[word]=today());
   saveDone(); updateSheetBtns(word); updateStats();
   showToast(doneMap[word]?'✅ 学習済みにしました':'学習記録を解除しました');
@@ -581,9 +773,32 @@ document.getElementById('sheetDoneBtn').addEventListener('click',function(){
 //  JS: お気に入りページ
 // ═══════════════════════════════════════════════════════════════
 function renderFavPage() {
-  var words=allWords.filter(function(w){return favSet.has(w.word);});
-  if(!words.length){ document.getElementById('favList').innerHTML='<div class="empty-state"><span class="empty-icon">⭐</span>まだお気に入りがありません</div>'; return; }
-  renderCards(words,'favList');
+  var favWords = allWords.filter(function(w){return favSet.has(w.word);});
+  var el = document.getElementById('favList');
+  if(!favWords.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">⭐</span>まだお気に入りがありません</div>';
+    return;
+  }
+  // お気に入りはフラット展開して表示
+  var rows=[];
+  favWords.forEach(function(w){
+    var urls=w.urls||{};
+    Object.keys(urls).forEach(function(src){
+      var url=urls[src]; if(!url)return;
+      rows.push({word:w.word,reading:w.reading,cefr:w.cefr,category:w.category,note:w.note,src:src,url:url,_wordIndex:w._index});
+    });
+  });
+  el.innerHTML='<div class="result-list">'+rows.map(function(row){
+    var label=SOURCE_LABELS[row.src]||row.src;
+    var icon=SOURCE_EXT[row.src]?'🔗':'▶';
+    return '<div class="result-row fav-row">'+
+      '<div class="row-word-wrap"><span class="row-word">'+esc(row.word)+'</span><span class="row-reading">'+esc(row.reading)+'</span></div>'+
+      '<div class="row-src"><span class="row-src-icon">'+icon+'</span><span class="row-src-label">'+esc(label)+'</span></div>'+
+      '</div>';
+  }).join('')+'</div>';
+  el.querySelectorAll('.fav-row').forEach(function(el,i){
+    el.addEventListener('click',function(){openSheet(rows[i]);});
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -593,13 +808,15 @@ function renderDonePage() {
   updateStats();
   var entries=Object.entries(doneMap).sort(function(a,b){return b[1].localeCompare(a[1]);});
   var el=document.getElementById('doneList');
-  if(!entries.length){ el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>'; return; }
+  if(!entries.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>';return;}
   el.innerHTML=entries.map(function(e){
     return '<div class="done-card">'+
       '<div><div class="done-word">'+esc(e[0])+'</div><div class="done-date">'+e[1]+'</div></div>'+
       '<button class="done-undo" data-word="'+esc(e[0])+'">解除</button></div>';
   }).join('');
-  el.querySelectorAll('.done-undo').forEach(function(btn){ btn.addEventListener('click',function(){ delete doneMap[btn.dataset.word]; saveDone(); renderDonePage(); updateStats(); }); });
+  el.querySelectorAll('.done-undo').forEach(function(btn){
+    btn.addEventListener('click',function(){delete doneMap[btn.dataset.word];saveDone();renderDonePage();updateStats();});
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -607,60 +824,55 @@ function renderDonePage() {
 // ═══════════════════════════════════════════════════════════════
 function buildCategorySelects() {
   var sel=document.getElementById('editCategory');
-  sel.innerHTML=categoryList.map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+  sel.innerHTML=categoryList.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
 }
-
 function populateSourceSelect() {
   var sel=document.getElementById('addSource');
-  sel.innerHTML=Object.keys(SOURCE_LABELS).map(function(k){ return '<option value="'+k+'">'+SOURCE_LABELS[k]+'</option>'; }).join('');
+  sel.innerHTML=Object.keys(SOURCE_LABELS).map(function(k){return '<option value="'+k+'">'+SOURCE_LABELS[k]+'</option>';}).join('');
 }
 
 document.getElementById('addBtn').addEventListener('click',function(){
   var word=document.getElementById('addWord').value.trim();
   if(!word){showToast('⚠️ 単語名を入力してください');return;}
   var btn=document.getElementById('addBtn');
-  btn.textContent='追加中…'; btn.disabled=true;
+  btn.textContent='追加中…';btn.disabled=true;
   gasCall('addWordFromClient',[{
-    word:word, reading:document.getElementById('addReading').value.trim(),
-    source:document.getElementById('addSource').value, section:document.getElementById('addSection').value,
-    url:document.getElementById('addUrl').value.trim(), note:document.getElementById('addNote').value.trim()
+    word:word,reading:document.getElementById('addReading').value.trim(),
+    source:document.getElementById('addSource').value,section:document.getElementById('addSection').value,
+    url:document.getElementById('addUrl').value.trim(),note:document.getElementById('addNote').value.trim()
   }],function(){
     showToast('✅ 追加しました');
     ['addWord','addReading','addUrl','addNote'].forEach(function(id){document.getElementById(id).value='';});
-    btn.textContent='追加する'; btn.disabled=false; Cache.clear(); init();
-  },function(e){ showToast('❌ '+e.message); btn.textContent='追加する'; btn.disabled=false; });
+    btn.textContent='追加する';btn.disabled=false;Cache.clear();init();
+  },function(e){showToast('❌ '+e.message);btn.textContent='追加する';btn.disabled=false;});
 });
 
-document.getElementById('adminSearch').addEventListener('input',function(){ renderEditList(this.value.trim()); });
+document.getElementById('adminSearch').addEventListener('input',function(){renderEditList(this.value.trim());});
 
 function renderEditList(q) {
-  var words=q?allWords.filter(function(w){return w.word.includes(q)||w.reading.includes(q);}):allWords.slice(0,30);
+  var words=q?allWords.filter(function(w){return w.word.includes(q)||hiraToKata(w.reading).includes(hiraToKata(q));}):allWords.slice(0,30);
   var el=document.getElementById('editList');
   if(!words.length){el.innerHTML='<div style="font-size:13px;color:var(--ink-muted);padding:8px">見つかりません</div>';return;}
   el.innerHTML=words.map(function(w){
     return '<div class="edit-item">'+
-      '<div><div class="edit-word">'+esc(w.word)+'</div>'+
-      '<div class="edit-src">'+(SOURCE_LABELS[w.source]||w.source)+'　'+(w.category||'')+'</div></div>'+
-      '<div class="edit-btns">'+
-        '<button class="edit-btn" data-index="'+w._index+'">編集</button>'+
-        '<button class="edit-btn del" data-index="'+w._index+'">削除</button>'+
-      '</div></div>';
+      '<div><div class="edit-word">'+esc(w.word)+'</div><div class="edit-src">'+(SOURCE_LABELS[w.source]||w.source)+'　'+(w.category||'')+'</div></div>'+
+      '<div class="edit-btns"><button class="edit-btn" data-index="'+w._index+'">編集</button><button class="edit-btn del" data-index="'+w._index+'">削除</button></div>'+
+      '</div>';
   }).join('');
-  el.querySelectorAll('.edit-btn:not(.del)').forEach(function(btn){ btn.addEventListener('click',function(){ openEditModal(allWords[+btn.dataset.index]); }); });
-  el.querySelectorAll('.edit-btn.del').forEach(function(btn){ btn.addEventListener('click',function(){ deleteWord(allWords[+btn.dataset.index]); }); });
+  el.querySelectorAll('.edit-btn:not(.del)').forEach(function(btn){btn.addEventListener('click',function(){openEditModal(allWords[+btn.dataset.index]);});});
+  el.querySelectorAll('.edit-btn.del').forEach(function(btn){btn.addEventListener('click',function(){deleteWord(allWords[+btn.dataset.index]);});});
 }
 
 function openEditModal(w) {
-  document.getElementById('editRowIndex').value = w._index;
-  document.getElementById('editWordDisp').value = w.word;
-  document.getElementById('editReading').value  = w.reading;
-  document.getElementById('editNote').value     = w.note;
+  document.getElementById('editRowIndex').value=w._index;
+  document.getElementById('editWordDisp').value=w.word;
+  document.getElementById('editReading').value=w.reading;
+  document.getElementById('editNote').value=w.note;
   var sel=document.getElementById('editCategory');
-  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===w.category){sel.selectedIndex=i;break;} }
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===w.category){sel.selectedIndex=i;break;}}
   document.getElementById('editModal').classList.add('open');
 }
-
-document.getElementById('editCancel').addEventListener('click',function(){ document.getElementById('editModal').classList.remove('open'); });
+document.getElementById('editCancel').addEventListener('click',function(){document.getElementById('editModal').classList.remove('open');});
 document.getElementById('editSave').addEventListener('click',function(){
   var idx=+document.getElementById('editRowIndex').value;
   gasCall('updateWordFromClient',[idx,{
@@ -670,15 +882,14 @@ document.getElementById('editSave').addEventListener('click',function(){
   }],function(){
     showToast('✅ 更新しました');
     document.getElementById('editModal').classList.remove('open');
-    Cache.clear(); init();
+    Cache.clear();init();
     renderEditList(document.getElementById('adminSearch').value.trim());
   });
 });
-
 function deleteWord(w) {
   if(!confirm('「'+w.word+'」を削除しますか？'))return;
   gasCall('deleteWordFromClient',[w._index],function(){
-    showToast('🗑 削除しました'); Cache.clear(); init();
+    showToast('🗑 削除しました');Cache.clear();init();
     renderEditList(document.getElementById('adminSearch').value.trim());
   });
 }
@@ -693,8 +904,8 @@ document.querySelectorAll('.nav-item').forEach(function(item){
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
     item.classList.add('active');
     document.getElementById('page-'+page).classList.add('active');
-    if(page==='fav')   renderFavPage();
-    if(page==='done')  renderDonePage();
+    if(page==='fav')  renderFavPage();
+    if(page==='done') renderDonePage();
     if(page==='admin'){populateSourceSelect();renderEditList();}
   });
 });
@@ -702,28 +913,22 @@ document.querySelectorAll('.nav-item').forEach(function(item){
 // ═══════════════════════════════════════════════════════════════
 //  JS: キャッシュUI
 // ═══════════════════════════════════════════════════════════════
-function showCacheBar(fromCache) {
+function showCacheBar(fromCache){
   var bar=document.getElementById('cacheBar');
-  document.getElementById('cacheMsg').textContent = fromCache
+  document.getElementById('cacheMsg').textContent=fromCache
     ?'⚡ キャッシュから読み込みました（24時間有効）'
     :'⏳ サーバーから取得中…';
   bar.classList.add('show');
-  if(fromCache) setTimeout(function(){bar.classList.remove('show');},2500);
+  if(fromCache)setTimeout(function(){bar.classList.remove('show');},2500);
 }
 document.getElementById('cacheClearBtn').addEventListener('click',function(){
-  Cache.clear(); document.getElementById('cacheBar').classList.remove('show');
-  showToast('🔄 再取得します'); init();
+  Cache.clear();document.getElementById('cacheBar').classList.remove('show');
+  showToast('🔄 再取得します');init();
 });
 
 // ═══════════════════════════════════════════════════════════════
 //  JS: ユーティリティ
 // ═══════════════════════════════════════════════════════════════
-function toggleFav(index,btn){
-  var word=allWords[index].word;
-  if(favSet.has(word)){favSet.delete(word);btn.classList.remove('active');btn.textContent='☆';}
-  else{favSet.add(word);btn.classList.add('active');btn.textContent='⭐';}
-  saveFavs(); updateStats();
-}
 function saveFavs(){ localStorage.setItem('favs',JSON.stringify(Array.from(favSet))); }
 function saveDone(){ localStorage.setItem('done',JSON.stringify(doneMap)); }
 function updateStats(){
@@ -736,7 +941,121 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 var _tt;
 function showToast(msg){ var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){el.classList.remove('show');},2500); }
 
+// ═══════════════════════════════════════════════════════════════
+//  JS: あいうえお順ページ
+// ═══════════════════════════════════════════════════════════════
+
+// ひらがな→カタカナ対応表（グリッドボタン用）
+var KANA_MAP = {
+  'あ':'ア','い':'イ','う':'ウ','え':'エ','お':'オ',
+  'か':'カ','き':'キ','く':'ク','け':'ケ','こ':'コ',
+  'さ':'サ','し':'シ','す':'ス','せ':'セ','そ':'ソ',
+  'た':'タ','ち':'チ','つ':'ツ','て':'テ','と':'ト',
+  'な':'ナ','に':'ニ','ぬ':'ヌ','ね':'ネ','の':'ノ',
+  'は':'ハ','ひ':'ヒ','ふ':'フ','へ':'ヘ','ほ':'ホ',
+  'ま':'マ','み':'ミ','む':'ム','め':'メ','も':'モ',
+  'や':'ヤ','ゆ':'ユ','よ':'ヨ',
+  'ら':'ラ','り':'リ','る':'ル','れ':'レ','ろ':'ロ',
+  'わ':'ワ','を':'ヲ','ん':'ン'
+};
+
+var selectedKana = null; // 選択中のかな（nullなら未選択）
+
+function initKanaGrid() {
+  // かなボタンのクリック
+  document.querySelectorAll('.kana-btn[data-kana]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var kana = btn.dataset.kana;
+      setKanaActive(btn, kana);
+      renderKanaResults(kana, false);
+    });
+  });
+
+  // 英数ボタン
+  document.getElementById('eisuuBtn').addEventListener('click', function() {
+    document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
+    var eb = document.getElementById('eisuuBtn');
+    var isActive = eb.classList.toggle('active');
+    if(isActive){
+      selectedKana = '英数';
+      renderKanaResults(null, true);
+    } else {
+      selectedKana = null;
+      document.getElementById('kanaResults').innerHTML = '';
+    }
+  });
+}
+
+function setKanaActive(btn, kana) {
+  document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('eisuuBtn').classList.remove('active');
+  btn.classList.add('active');
+  selectedKana = kana;
+}
+
+function renderKanaResults(kana, isEisuu) {
+  var kata = kana ? (KANA_MAP[kana]||hiraToKata(kana)) : null;
+
+  // フィルタリング
+  var results = allWords.filter(function(w) {
+    if(!w.reading && !w.word) return false;
+    var firstChar = hiraToKata(w.reading||w.word)[0]||'';
+    if(isEisuu) {
+      // 英数：アルファベット（全角半角）または数字で始まる
+      return /^[A-Za-zＡ-Ｚａ-ｚ0-9０-９]/.test(firstChar) ||
+             /^[A-Za-zＡ-Ｚａ-ｚ0-9０-９]/.test((w.word||'')[0]||'');
+    } else {
+      return firstChar === kata;
+    }
+  });
+
+  // よみ順にソート
+  results.sort(function(a,b){
+    return hiraToKata(a.reading||a.word).localeCompare(hiraToKata(b.reading||b.word),'ja');
+  });
+
+  var title = isEisuu ? '英数で始まる手話' : (KANA_MAP[kana]||kata)+'（'+kana+'）で始まる手話';
+  var el = document.getElementById('kanaResults');
+
+  if(!results.length){
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>該当する単語がありません</div>';
+    return;
+  }
+
+  var rows = results.map(function(w, i){
+    return '<div class="kana-row" data-wi="'+w._index+'">'+
+      '<span class="kana-row-word">'+esc(w.word)+'</span>'+
+      '<span class="kana-row-read">'+esc(w.reading)+'</span>'+
+      '</div>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="kana-result-title">'+esc(title)+'　<strong style="font-family:var(--font-mono);color:var(--ink-muted)">'+results.length+'件</strong></div>'+
+    '<div class="kana-table">'+
+      '<div class="kana-table-head"><span>見出し語</span><span>よみ</span></div>'+
+      rows+
+    '</div>';
+
+  // クリックでミニシート（最初のURLを使用）
+  el.querySelectorAll('.kana-row').forEach(function(row){
+    row.addEventListener('click', function(){
+      var w = allWords[+row.dataset.wi];
+      if(!w) return;
+      var urls = w.urls||{};
+      var firstSrc = Object.keys(urls)[0];
+      if(!firstSrc) return;
+      openSheet({
+        word:w.word, reading:w.reading,
+        cefr:w.cefr, category:w.category, note:w.note,
+        src:firstSrc, url:urls[firstSrc], _wordIndex:w._index
+      });
+    });
+  });
+}
+
+// ─ 起動 ─
 init();
+initKanaGrid();
 </script>
 </body>
 </html>
