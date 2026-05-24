@@ -211,7 +211,18 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .modal-btn { flex: 1; padding: 10px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-mid); }
 .modal-btn.ok { background: var(--forest); color: #fff; border-color: var(--forest); }
 
-/* ─ 共通 ─ */
+/* ─ エラーバナー ─ */
+.error-banner { display:none; background:#fff5f5; border-left:3px solid var(--red); padding:10px 14px; border-radius:var(--radius-sm); font-size:12px; color:#b91c1c; margin-top:8px; line-height:1.6; }
+.error-banner.show { display:block; }
+
+/* ─ 参考チャンネルページ ─ */
+.channel-category { font-size:12px; font-weight:700; color:var(--ink-muted); letter-spacing:0.06em; margin:16px 0 8px; padding-left:2px; }
+.channel-card { background:var(--white); border:1.5px solid var(--line); border-left:4px solid var(--lime); border-radius:var(--radius); padding:12px 14px; margin-bottom:8px; box-shadow:var(--shadow); cursor:pointer; transition:border-color 0.15s, box-shadow 0.12s; text-decoration:none; display:block; }
+.channel-card:hover { border-left-color:var(--forest); box-shadow:var(--shadow-md); }
+.channel-name { font-size:14px; font-weight:700; font-family:var(--font-display); color:var(--forest); }
+.channel-op   { font-size:11px; color:var(--ink-muted); margin-top:2px; }
+.channel-cefr { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; background:var(--lime-light); color:var(--forest); font-family:var(--font-mono); border:1px solid var(--line); margin-top:6px; }
+.channel-note { font-size:12px; color:var(--ink-mid); margin-top:6px; line-height:1.6; }
 .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--forest); color: #fff; font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 24px; opacity: 0; pointer-events: none; z-index: 999; white-space: nowrap; transition: opacity 0.22s; box-shadow: var(--shadow-md); }
 .toast.show { opacity: 1; }
 .loading { text-align: center; padding: 40px 16px; color: var(--ink-muted); font-size: 14px; }
@@ -250,6 +261,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <span id="cacheMsg"></span>
     <button class="cache-bar-clear" id="cacheClearBtn">再取得</button>
   </div>
+  <div class="error-banner" id="errorBanner"></div>
 
   <div id="searchArea">
     <div class="search-empty">
@@ -309,6 +321,16 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div class="admin-title">✏️ 編集・削除</div>
     <input class="form-ctrl" id="adminSearch" placeholder="単語を検索…" style="margin-bottom:10px">
     <div class="edit-result-list" id="editList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HTML: 参考チャンネルページ
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-ref">
+  <div class="page-title">📺 参考チャンネル・サイト</div>
+  <div id="refList">
+    <div class="loading"><div class="spinner"></div>読み込み中…</div>
   </div>
 </div>
 
@@ -393,6 +415,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   <div class="nav-item active" data-page="search"><div class="nav-icon">🔍</div><div>検索</div></div>
   <div class="nav-item" data-page="aiueo"><div class="nav-icon">🔤</div><div>あいうえお</div></div>
   <div class="nav-item" data-page="fav"><div class="nav-icon">⭐</div><div>お気に入り</div></div>
+  <div class="nav-item" data-page="ref"><div class="nav-icon">📺</div><div>参考</div></div>
   <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>記録</div></div>
   <div class="nav-item" data-page="admin"><div class="nav-icon">⚙️</div><div>管理</div></div>
 </nav>
@@ -548,7 +571,19 @@ function init() {
   if(cached){ showCacheBar(true); onWordsLoaded(cached); }
   else{
     showCacheBar(false);
-    gasCall('getWordList',[],function(data){ Cache.set(CACHE_KEY,data); onWordsLoaded(data); });
+    gasCall('getWordList',[],
+      function(data){
+        document.getElementById('errorBanner').classList.remove('show');
+        Cache.set(CACHE_KEY,data);
+        onWordsLoaded(data);
+      },
+      function(err){
+        var ban=document.getElementById('errorBanner');
+        ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err.message||String(err))+'<br>→ GAS_URLを確認してください';
+        ban.classList.add('show');
+        document.getElementById('cacheBar').classList.remove('show');
+      }
+    );
   }
 }
 
@@ -912,6 +947,7 @@ document.querySelectorAll('.nav-item').forEach(function(item){
     document.getElementById('page-'+page).classList.add('active');
     if(page==='fav')  renderFavPage();
     if(page==='done') renderDonePage();
+    if(page==='ref')  renderRefPage();
     if(page==='admin'){populateSourceSelect();renderEditList();}
   });
 });
@@ -1057,6 +1093,67 @@ function renderKanaResults(kana, isEisuu) {
       });
     });
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: 参考チャンネルページ
+// ═══════════════════════════════════════════════════════════════
+var channelList  = [];
+var refLoaded    = false;
+
+function renderRefPage() {
+  if(refLoaded){ buildRefHTML(); return; }
+  var cached = Cache.get('shuwa-v9-ref');
+  if(cached){ channelList=cached; refLoaded=true; buildRefHTML(); return; }
+
+  document.getElementById('refList').innerHTML =
+    '<div class="loading"><div class="spinner"></div>読み込み中…</div>';
+
+  gasCall('getChannelList',[],
+    function(data){
+      channelList = data||[];
+      Cache.set('shuwa-v9-ref', channelList);
+      refLoaded = true;
+      buildRefHTML();
+    },
+    function(err){
+      document.getElementById('refList').innerHTML =
+        '<div class="error-banner show">❌ 読み込みエラー: '+(err.message||String(err))+'</div>';
+    }
+  );
+}
+
+function buildRefHTML() {
+  var el = document.getElementById('refList');
+  if(!channelList.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">📺</span>データがありません</div>';
+    return;
+  }
+  // カテゴリでグループ化
+  var groups = {};
+  channelList.forEach(function(ch){
+    var cat = ch['category（カテゴリ）']||'その他';
+    if(!groups[cat]) groups[cat]=[];
+    groups[cat].push(ch);
+  });
+  var html='';
+  Object.keys(groups).forEach(function(cat){
+    html += '<div class="channel-category">▶ '+esc(cat)+'</div>';
+    groups[cat].forEach(function(ch){
+      var name  = ch['name（名称）']||'';
+      var op    = ch['operator（運営）']||'';
+      var url   = ch['url（URL）']||'#';
+      var cefr  = ch['cefr（レベル）']||'';
+      var note  = ch['note（説明）']||'';
+      html += '<a class="channel-card" href="'+esc(url)+'" target="_blank" rel="noopener">'+
+        '<div class="channel-name">'+esc(name)+'</div>'+
+        (op?'<div class="channel-op">'+esc(op)+'</div>':'')+
+        (cefr?'<span class="channel-cefr">'+esc(cefr)+'</span>':'')+
+        (note?'<div class="channel-note">'+esc(note)+'</div>':'')+
+        '</a>';
+    });
+  });
+  el.innerHTML = html;
 }
 
 // ─ 起動 ─
