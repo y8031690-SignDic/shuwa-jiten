@@ -3,8 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>手話辞書 | 日本手話学習辞典</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>手話単！ | 手話学習者のための単語検索</title>
+<!-- ═══════════════════════════════════════════════════════════════
+     Google Analytics 4
+     ★ GA4の測定IDを取得後、G-XXXXXXXXXXを書き換えてください
+     ═══════════════════════════════════════════════════════════════ -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZDM6JOETLJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZDM6JOETLJ');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap" rel="stylesheet">
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -57,7 +67,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ─ ボトムナビ（5項目対応） ─ */
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: var(--white); border-top: 2px solid var(--line); display: flex; justify-content: space-around; padding: 6px 0 env(safe-area-inset-bottom,6px); box-shadow: 0 -2px 12px rgba(45,90,39,0.08); }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 10px; color: var(--ink-muted); font-size: 9px; font-weight: 500; cursor: pointer; transition: color 0.15s; min-width: 0; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 6px; color: var(--ink-muted); font-size: 8px; font-weight: 500; cursor: pointer; transition: color 0.15s; min-width: 0; }
 .nav-item.active { color: var(--forest); }
 .nav-icon { font-size: 18px; line-height: 1; }
 
@@ -228,6 +238,46 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .loading { text-align: center; padding: 40px 16px; color: var(--ink-muted); font-size: 14px; }
 .spinner { width: 28px; height: 28px; margin: 0 auto 12px; border: 2.5px solid var(--line); border-top-color: var(--lime); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* ─ 検索統計 ─ */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+@media(max-width:480px){ .stats-grid { grid-template-columns: 1fr; } }
+.stats-col-title { font-size: 12px; font-weight: 700; color: var(--forest); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--lime-light); }
+.stats-row { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 12px; gap: 6px; }
+.stats-row:last-child { border-bottom: none; }
+.stats-rank  { font-size: 11px; color: var(--ink-muted); font-family: var(--font-mono); min-width: 24px; }
+.stats-query { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-count { font-size: 11px; color: var(--ink-muted); font-family: var(--font-mono); white-space: nowrap; }
+.stats-zero  { color: var(--red); }
+.stats-total { font-size: 11px; color: var(--ink-muted); margin-bottom: 10px; }
+.stats-load-btn { width: 100%; padding: 10px; background: var(--lime-light); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; color: var(--forest); cursor: pointer; transition: all 0.15s; }
+.stats-load-btn:hover { background: var(--lime); color: #fff; border-color: var(--lime); }
+
+/* ─ フッター ─ */
+.site-footer { margin: 24px 0 8px; padding: 16px 0 8px; border-top: 1px solid var(--line); text-align: center; }
+.footer-links { display: flex; justify-content: center; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
+.footer-link { font-size: 12px; color: var(--ink-muted); text-decoration: underline; cursor: pointer; transition: color 0.15s; }
+.footer-link:hover { color: var(--forest); }
+.footer-copy { font-size: 11px; color: var(--ink-muted); margin-bottom: 6px; }
+.footer-ai-credit { font-size: 10px; color: var(--ink-muted); line-height: 1.7; padding: 0 8px; }
+.footer-ai-credit a { color: var(--ink-muted); text-decoration: underline; }
+
+/* ─ 目安箱フローティングボタン ─ */
+.meyasubako-fab { position: fixed; bottom: 86px; right: 16px; z-index: 150; background: var(--teal); color: #fff; border-radius: 50px; padding: 10px 16px; font-size: 12px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,137,123,0.35); display: flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; transition: background 0.15s, transform 0.15s; }
+.meyasubako-fab:hover { background: var(--forest); transform: translateY(-2px); }
+
+/* ─ 利用規約・クレジットページ ─ */
+.terms-section { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.terms-h2 { font-size: 14px; font-weight: 900; color: var(--forest); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--lime-light); font-family: var(--font-display); }
+.terms-h3 { font-size: 13px; font-weight: 700; color: var(--forest-mid); margin: 12px 0 6px; }
+.terms-p  { font-size: 13px; color: var(--ink-mid); line-height: 1.8; margin-bottom: 8px; }
+.terms-ul { font-size: 13px; color: var(--ink-mid); line-height: 1.8; padding-left: 18px; margin-bottom: 8px; }
+.terms-ul li { margin-bottom: 4px; }
+.credit-card { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.credit-card:last-child { border-bottom: none; }
+.credit-icon { font-size: 28px; flex-shrink: 0; }
+.credit-name { font-size: 13px; font-weight: 700; color: var(--forest); }
+.credit-desc { font-size: 12px; color: var(--ink-muted); margin-top: 3px; line-height: 1.6; }
+.credit-link { font-size: 11px; color: var(--teal); text-decoration: underline; margin-top: 4px; display: inline-block; }
 </style>
 </head>
 <body>
@@ -238,8 +288,8 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 <header class="header">
   <div class="header-logo">🤟</div>
   <div class="header-text">
-    <div class="header-title">手話辞書</div>
-    <div class="header-sub">日本手話学習辞典</div>
+    <div class="header-title">手話単！</div>
+    <div class="header-sub">手話学習者のための単語検索</div>
   </div>
   <div id="headerCount" class="header-count"></div>
 </header>
@@ -303,6 +353,14 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      ═══════════════════════════════════════════════════════════════ -->
 <div class="page" id="page-admin">
   <div class="page-title">⚙️ 管理者</div>
+
+  <!-- 検索統計 -->
+  <div class="admin-card">
+    <div class="admin-title">📊 検索統計</div>
+    <div id="statsArea">
+      <button class="stats-load-btn" id="statsLoadBtn">統計を読み込む</button>
+    </div>
+  </div>
   <div class="admin-card">
     <div class="admin-title">➕ 単語を追加</div>
     <div class="form-row">
@@ -399,11 +457,107 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <button class="kana-btn empty"></button>
   </div>
 
-  <!-- 英数ボタン -->
-  <button class="eisuu-btn" id="eisuuBtn">英数（A B C … 1 2 3 …）</button>
+  <!-- 英・数ボタン -->
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="eisuu-btn" id="eiBtnEi" style="flex:1">英（A B C …）</button>
+    <button class="eisuu-btn" id="eiBtnSu" style="flex:1">数（1 2 3 …）</button>
+  </div>
 
   <!-- 結果表示 -->
   <div id="kanaResults"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HTML: 利用規約・クレジットページ
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-terms">
+  <div class="page-title">📄 利用規約・クレジット</div>
+
+  <div class="terms-section">
+    <div class="terms-h2">📋 利用規約</div>
+    <div class="terms-h3">1. サービスについて</div>
+    <p class="terms-p">手話単！（以下「本サービス」）は、日本手話の学習を支援することを目的とした無料の単語検索サービスです。個人が非営利で運営しています。</p>
+
+    <div class="terms-h3">2. 免責事項</div>
+    <p class="terms-p">本サービスで提供する情報は、各動画ソースをもとに収録していますが、手話表現の正確性・完全性を保証するものではありません。手話には地域差・個人差があります。学習の参考としてご活用ください。</p>
+
+    <div class="terms-h3">3. 著作権・出典</div>
+    <p class="terms-p">本サービスに掲載された動画リンクはすべて外部サービス（YouTube・NHK等）へのリンクです。動画の著作権は各コンテンツ提供者に帰属します。本サービスはリンクを提供するのみで、動画コンテンツを所有・配布するものではありません。</p>
+
+    <div class="terms-h3">4. 禁止事項</div>
+    <ul class="terms-ul">
+      <li>本サービスのデータを無断で商業利用すること</li>
+      <li>本サービスに過度な負荷をかける行為</li>
+      <li>その他、運営者が不適切と判断する行為</li>
+    </ul>
+
+    <div class="terms-h3">5. 変更・中断</div>
+    <p class="terms-p">本サービスは予告なく内容を変更・中断・終了する場合があります。あらかじめご了承ください。</p>
+
+    <div class="terms-h3">6. プライバシー</div>
+    <p class="terms-p">本サービスでは、サービス改善のためGoogle Analytics（GA4）による匿名のアクセス解析と、検索キーワードのログを収集しています。個人を特定する情報は収集しません。</p>
+  </div>
+
+  <div class="terms-section">
+    <div class="terms-h2">🙏 クレジット・謝辞</div>
+    <p class="terms-p">本サービスは以下のサービス・コンテンツ提供者の皆さまのご協力のもと成り立っています。</p>
+
+    <div class="credit-card">
+      <div class="credit-icon">📺</div>
+      <div>
+        <div class="credit-name">各YouTubeチャンネル・動画提供者の皆さま</div>
+        <div class="credit-desc">kcc-smartdeaf、shuwa-friends、shuwamon、wp-terakoya、bbedbooks、kansai-jsl、signs-io、otokogumi、sunada-atom、imai-akito、ezoe-satoshi、shuwa-bunka-mura、araki-hirohiko、yoshiyama、mimisuppo、asaka-shakyo、accessible-cancer、deaf-highschool、mede-kiku-tv ほか</div>
+      </div>
+    </div>
+
+    <div class="credit-card">
+      <div class="credit-icon">🏫</div>
+      <div>
+        <div class="credit-name">筑波技術大学 手話言語データベース</div>
+        <div class="credit-desc">tsukuba_roa / kyoto1 / kyoto2 / osaka / shiori / kyushu / cks / edu</div>
+      </div>
+    </div>
+
+    <div class="credit-card">
+      <div class="credit-icon">📡</div>
+      <div>
+        <div class="credit-name">NHK 手話CG</div>
+        <div class="credit-desc">NHK放送技術研究所による手話CG検索サービス</div>
+        <a class="credit-link" href="https://www.nhk.or.jp/strl/signlanguagecg/searchJSL/" target="_blank" rel="noopener">nhk.or.jp</a>
+      </div>
+    </div>
+
+    <div class="credit-card">
+      <div class="credit-icon">🤖</div>
+      <div>
+        <div class="credit-name">Claude（Anthropic）</div>
+        <div class="credit-desc">本サービスの設計・開発に全面的に協力したAI</div>
+        <a class="credit-link" href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="terms-section">
+    <div class="terms-h2">📬 お問い合わせ・目安箱</div>
+    <p class="terms-p">掲載内容の誤り・追加リクエスト・ご意見などは目安箱からお気軽にどうぞ。</p>
+    <a class="sheet-link-btn ext" href="https://forms.gle/ZB4oPqyEQL1rJArm7" target="_blank" rel="noopener">
+      <span class="sheet-link-icon">📬</span>
+      <span class="sheet-link-label">目安箱（ご意見・リクエスト）</span>
+      <span class="sheet-link-arrow">→</span>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HTML: サイトフッター（全ページ共通）
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="site-footer">
+  <div class="footer-links">
+    <span class="footer-link" onclick="showPage('terms')">利用規約・クレジット</span>
+    <a class="footer-link" href="https://forms.gle/ZB4oPqyEQL1rJArm7" target="_blank" rel="noopener">📬 目安箱</a>
+  </div>
+  <div class="footer-copy">© 2025 手話単！ All rights reserved.</div>
+  <div class="footer-ai-credit">※このサイトは、ずぶの素人（Y）に、AIである私（<a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>）が全面的に協力することによって作成されたものです</div>
 </div>
 
 </div><!-- /.app -->
@@ -411,6 +565,11 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 <!-- ═══════════════════════════════════════════════════════════════
      HTML: ボトムナビ
      ═══════════════════════════════════════════════════════════════ -->
+<!-- 目安箱フローティングボタン -->
+<a class="meyasubako-fab" href="https://forms.gle/ZB4oPqyEQL1rJArm7" target="_blank" rel="noopener">
+  📬 目安箱
+</a>
+
 <nav class="bottom-nav">
   <div class="nav-item active" data-page="search"><div class="nav-icon">🔍</div><div>検索</div></div>
   <div class="nav-item" data-page="aiueo"><div class="nav-icon">🔤</div><div>あいうえお</div></div>
@@ -418,6 +577,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   <div class="nav-item" data-page="ref"><div class="nav-icon">📺</div><div>参考</div></div>
   <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>記録</div></div>
   <div class="nav-item" data-page="admin"><div class="nav-icon">⚙️</div><div>管理</div></div>
+  <div class="nav-item" data-page="terms"><div class="nav-icon">📄</div><div>規約</div></div>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -645,8 +805,17 @@ function applyFilter() {
     });
   });
 
+  // よみ順（あいうえお順）でソート
+  flatRows.sort(function(a, b) {
+    return hiraToKata(a.reading || a.word)
+      .localeCompare(hiraToKata(b.reading || b.word), 'ja');
+  });
+
   currentPage = 1;
   renderPage();
+
+  // 検索ログを非同期送信（1.5秒後）
+  scheduleLog(q, flatRows.length);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -952,6 +1121,17 @@ document.querySelectorAll('.nav-item').forEach(function(item){
   });
 });
 
+// フッターリンクなどから直接ページを開くためのヘルパー
+function showPage(page){
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var navItem = document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(navItem) navItem.classList.add('active');
+  var pageEl = document.getElementById('page-'+page);
+  if(pageEl) pageEl.classList.add('active');
+  window.scrollTo(0,0);
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  JS: キャッシュUI
 // ═══════════════════════════════════════════════════════════════
@@ -1013,58 +1193,71 @@ function initKanaGrid() {
     });
   });
 
-  // 英数ボタン
-  document.getElementById('eisuuBtn').addEventListener('click', function() {
+  // 英ボタン
+  document.getElementById('eiBtnEi').addEventListener('click', function() {
     document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
-    var eb = document.getElementById('eisuuBtn');
-    var isActive = eb.classList.toggle('active');
-    if(isActive){
-      selectedKana = '英数';
-      renderKanaResults(null, true);
-    } else {
-      selectedKana = null;
-      document.getElementById('kanaResults').innerHTML = '';
-    }
+    document.getElementById('eiBtnEi').classList.toggle('active');
+    document.getElementById('eiBtnSu').classList.remove('active');
+    if(document.getElementById('eiBtnEi').classList.contains('active')){
+      selectedKana = '英'; renderKanaResults(null, '英');
+    } else { selectedKana=null; document.getElementById('kanaResults').innerHTML=''; }
+  });
+
+  // 数ボタン
+  document.getElementById('eiBtnSu').addEventListener('click', function() {
+    document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('eiBtnSu').classList.toggle('active');
+    document.getElementById('eiBtnEi').classList.remove('active');
+    if(document.getElementById('eiBtnSu').classList.contains('active')){
+      selectedKana = '数'; renderKanaResults(null, '数');
+    } else { selectedKana=null; document.getElementById('kanaResults').innerHTML=''; }
   });
 }
 
 function setKanaActive(btn, kana) {
   document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('eisuuBtn').classList.remove('active');
+  document.getElementById('eiBtnEi').classList.remove('active');
+  document.getElementById('eiBtnSu').classList.remove('active');
   btn.classList.add('active');
   selectedKana = kana;
 }
 
-function renderKanaResults(kana, isEisuu) {
+function renderKanaResults(kana, type) {
   var kata = kana ? (KANA_MAP[kana]||hiraToKata(kana)) : null;
 
-  // フィルタリング
   var results = allWords.filter(function(w) {
     if(!w.reading && !w.word) return false;
-    var firstChar = hiraToKata(w.reading||w.word)[0]||'';
-    if(isEisuu) {
-      // 英数：アルファベット（全角半角）または数字で始まる
-      return /^[A-Za-zＡ-Ｚａ-ｚ0-9０-９]/.test(firstChar) ||
-             /^[A-Za-zＡ-Ｚａ-ｚ0-9０-９]/.test((w.word||'')[0]||'');
+    var firstRead = hiraToKata(w.reading||w.word)[0]||'';
+    var firstWord = (w.word||'')[0]||'';
+
+    if(type === '英') {
+      // アルファベット（半角・全角）
+      return /^[A-Za-zＡ-Ｚａ-ｚ]/.test(firstRead) ||
+             /^[A-Za-zＡ-Ｚａ-ｚ]/.test(firstWord);
+    } else if(type === '数') {
+      // 数字（半角・全角）
+      return /^[0-9０-９]/.test(firstRead) ||
+             /^[0-9０-９]/.test(firstWord);
     } else {
-      return firstChar === kata;
+      return firstRead === kata;
     }
   });
 
-  // よみ順にソート
   results.sort(function(a,b){
     return hiraToKata(a.reading||a.word).localeCompare(hiraToKata(b.reading||b.word),'ja');
   });
 
-  var title = isEisuu ? '英数で始まる手話' : (KANA_MAP[kana]||kata)+'（'+kana+'）で始まる手話';
-  var el = document.getElementById('kanaResults');
+  var title = type === '英' ? 'アルファベットで始まる手話' :
+              type === '数' ? '数字で始まる手話' :
+              (KANA_MAP[kana]||kata)+'（'+kana+'）で始まる手話';
 
+  var el = document.getElementById('kanaResults');
   if(!results.length){
-    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>該当する単語がありません</div>';
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">🔍</span>該当する単語がありません</div>';
     return;
   }
 
-  var rows = results.map(function(w, i){
+  var rows = results.map(function(w){
     return '<div class="kana-row" data-wi="'+w._index+'">'+
       '<span class="kana-row-word">'+esc(w.word)+'</span>'+
       '<span class="kana-row-read">'+esc(w.reading)+'</span>'+
@@ -1078,7 +1271,6 @@ function renderKanaResults(kana, isEisuu) {
       rows+
     '</div>';
 
-  // クリックでミニシート（最初のURLを使用）
   el.querySelectorAll('.kana-row').forEach(function(row){
     row.addEventListener('click', function(){
       var w = allWords[+row.dataset.wi];
@@ -1154,6 +1346,77 @@ function buildRefHTML() {
     });
   });
   el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: 検索ログ（1.5秒後に非同期送信・UIをブロックしない）
+// ═══════════════════════════════════════════════════════════════
+var _logTimer;
+function scheduleLog(query, count) {
+  clearTimeout(_logTimer);
+  if (!query || query.length < 2) return;
+  _logTimer = setTimeout(function() {
+    // GA4カスタムイベント
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'search', { search_term: query, results_count: count });
+    }
+    // GAS検索ログ（エラーは無視してUIに影響させない）
+    gasCall('logSearch', [query, count], function(){}, function(){});
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: 検索統計表示
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('statsLoadBtn').addEventListener('click', function() {
+  var btn = document.getElementById('statsLoadBtn');
+  btn.textContent = '読み込み中…'; btn.disabled = true;
+  gasCall('getSearchStats', [], function(data) {
+    buildStatsHTML(data);
+  }, function(err) {
+    document.getElementById('statsArea').innerHTML =
+      '<div class="error-banner show">❌ ' + (err.message||String(err)) + '</div>';
+  });
+});
+
+function buildStatsHTML(data) {
+  var top   = data.top   || [];
+  var zeros = data.zeros || [];
+  var total = data.total || 0;
+
+  if (!total) {
+    document.getElementById('statsArea').innerHTML =
+      '<div style="font-size:13px;color:var(--ink-muted);padding:8px">まだ検索ログがありません</div>';
+    return;
+  }
+
+  var topRows = top.map(function(r, i) {
+    return '<div class="stats-row">' +
+      '<span class="stats-rank">' + (i+1) + '.</span>' +
+      '<span class="stats-query">' + esc(r.query) + '</span>' +
+      '<span class="stats-count">' + r.count + '回</span></div>';
+  }).join('');
+
+  var zeroRows = zeros.map(function(r, i) {
+    return '<div class="stats-row">' +
+      '<span class="stats-rank">' + (i+1) + '.</span>' +
+      '<span class="stats-query stats-zero">' + esc(r.query) + '</span>' +
+      '<span class="stats-count">' + r.count + '回</span></div>';
+  }).join('') || '<div style="font-size:12px;color:var(--ink-muted);padding:6px">なし</div>';
+
+  document.getElementById('statsArea').innerHTML =
+    '<div class="stats-total">累計検索回数: <strong>' + total.toLocaleString() + '回</strong></div>' +
+    '<div class="stats-grid">' +
+      '<div>' +
+        '<div class="stats-col-title">🔍 検索ランキング</div>' +
+        topRows +
+      '</div>' +
+      '<div>' +
+        '<div class="stats-col-title">⚠️ 辞書追加候補（0件）</div>' +
+        zeroRows +
+      '</div>' +
+    '</div>' +
+    '<button class="stats-load-btn" style="margin-top:12px" onclick="location.reload()">🔄 更新</button>';
 }
 
 // ─ 起動 ─
