@@ -248,14 +248,14 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .kana-detail-btn { padding: 10px 16px; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; color: var(--forest); font-family: var(--font-display); transition: all 0.15s; min-width: 48px; text-align: center; }
 .kana-detail-btn:hover, .kana-detail-btn.active { background: var(--lime); color: #fff; border-color: var(--lime); }
 
+.search-hint { font-size: 12px; color: var(--ink-muted); margin-top: 6px; }
 .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--forest); color: #fff; font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 24px; opacity: 0; pointer-events: none; z-index: 999; white-space: nowrap; transition: opacity 0.22s; box-shadow: var(--shadow-md); }
 .toast.show { opacity: 1; }
 .loading { text-align: center; padding: 40px 16px; color: var(--ink-muted); font-size: 14px; }
 .spinner { width: 28px; height: 28px; margin: 0 auto 12px; border: 2.5px solid var(--line); border-top-color: var(--lime); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 /* ─ 検索統計 ─ */
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-@media(max-width:480px){ .stats-grid { grid-template-columns: 1fr; } }
+.stats-section { margin-top: 10px; }
 .stats-col-title { font-size: 12px; font-weight: 700; color: var(--forest); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--lime-light); }
 .stats-row { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 12px; gap: 6px; }
 .stats-row:last-child { border-bottom: none; }
@@ -327,7 +327,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input class="search-input" id="searchInput" type="search"
-             placeholder="単語名・よみ（かな・カタカナ）・カテゴリで検索…" autocomplete="off">
+             placeholder="単語名・よみ（かな・カタカナ）で検索…" autocomplete="off">
       <button class="search-clear" id="searchClear">✕</button>
     </div>
 
@@ -340,7 +340,8 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div id="searchArea">
       <div class="search-empty">
         <span class="search-empty-icon">🤟</span>
-        単語名・よみ・カテゴリを入力して<br>検索してください
+        単語名・よみ（かな・カタカナ）を入力して<br>検索してください
+        <div class="search-hint">例：「犬」「イヌ」「いぬ」</div>
       </div>
     </div>
 
@@ -409,22 +410,9 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
       <button class="stats-load-btn" id="statsLoadBtn">統計を読み込む</button>
     </div>
   </div>
+
   <div class="admin-card">
-    <div class="admin-title">➕ 単語を追加</div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">単語名 *</label><input class="form-ctrl" id="addWord" placeholder="例: 犬"></div>
-      <div class="form-group"><label class="form-label">よみ（カタカナ）</label><input class="form-ctrl" id="addReading" placeholder="例: イヌ"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">ソース *</label><select class="form-ctrl" id="addSource"></select></div>
-      <div class="form-group"><label class="form-label">編</label><select class="form-ctrl" id="addSection"><option>単語編</option><option>文法編</option><option>文化・芸術編</option><option>歴史編</option></select></div>
-    </div>
-    <div class="form-group"><label class="form-label">動画URL</label><input class="form-ctrl" id="addUrl" placeholder="https://…"></div>
-    <div class="form-group"><label class="form-label">補足・説明</label><textarea class="form-ctrl" id="addNote" placeholder="任意"></textarea></div>
-    <button class="submit-btn" id="addBtn">追加する</button>
-  </div>
-  <div class="admin-card">
-    <div class="admin-title">✏️ 編集・削除</div>
+    <div class="admin-title">✏️ 単語を編集</div>
     <input class="form-ctrl" id="adminSearch" placeholder="単語を検索…" style="margin-bottom:10px">
     <div class="edit-result-list" id="editList"></div>
   </div>
@@ -799,15 +787,14 @@ function applyFilter() {
   if(!q) {
     // 検索前：初期状態を表示
     document.getElementById('searchArea').innerHTML =
-      '<div class="search-empty"><span class="search-empty-icon">🤟</span>単語名・よみ・カテゴリを入力して<br>検索してください</div>';
+      '<div class="search-empty"><span class="search-empty-icon">🤟</span>単語名・よみ（かな・カタカナ）を入力して<br>検索してください<div class="search-hint">例：「犬」「イヌ」「いぬ」</div></div>';
     document.getElementById('pagination').classList.remove('show');
     return;
   }
 
   var filtered = allWords.filter(function(w){
     return w.word.includes(q) ||
-           hiraToKata(w.reading).includes(qKata) ||  // よみはカタカナ統一で比較
-           w.category.includes(q);
+           hiraToKata(w.reading).includes(qKata); // よみはカタカナ統一で比較
   });
 
   // フラット展開（word × source）
@@ -1061,27 +1048,6 @@ function buildCategorySelects() {
   var sel=document.getElementById('editCategory');
   sel.innerHTML=categoryList.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
 }
-function populateSourceSelect() {
-  var sel=document.getElementById('addSource');
-  sel.innerHTML=Object.keys(SOURCE_LABELS).map(function(k){return '<option value="'+k+'">'+SOURCE_LABELS[k]+'</option>';}).join('');
-}
-
-document.getElementById('addBtn').addEventListener('click',function(){
-  var word=document.getElementById('addWord').value.trim();
-  if(!word){showToast('⚠️ 単語名を入力してください');return;}
-  var btn=document.getElementById('addBtn');
-  btn.textContent='追加中…';btn.disabled=true;
-  gasCall('addWordFromClient',[{
-    word:word,reading:document.getElementById('addReading').value.trim(),
-    source:document.getElementById('addSource').value,section:document.getElementById('addSection').value,
-    url:document.getElementById('addUrl').value.trim(),note:document.getElementById('addNote').value.trim()
-  }],function(){
-    showToast('✅ 追加しました');
-    ['addWord','addReading','addUrl','addNote'].forEach(function(id){document.getElementById(id).value='';});
-    btn.textContent='追加する';btn.disabled=false;Cache.clear();init();
-  },function(e){showToast('❌ '+e.message);btn.textContent='追加する';btn.disabled=false;});
-});
-
 document.getElementById('adminSearch').addEventListener('input',function(){renderEditList(this.value.trim());});
 
 function renderEditList(q) {
@@ -1091,11 +1057,11 @@ function renderEditList(q) {
   el.innerHTML=words.map(function(w){
     return '<div class="edit-item">'+
       '<div><div class="edit-word">'+esc(w.word)+'</div><div class="edit-src">'+(SOURCE_LABELS[w.source]||w.source)+'　'+(w.category||'')+'</div></div>'+
-      '<div class="edit-btns"><button class="edit-btn" data-index="'+w._index+'">編集</button><button class="edit-btn del" data-index="'+w._index+'">削除</button></div>'+
+      '<div class="edit-btns"><button class="edit-btn" data-index="'+w._index+'">編集</button></div>'+
       '</div>';
   }).join('');
   el.querySelectorAll('.edit-btn:not(.del)').forEach(function(btn){btn.addEventListener('click',function(){openEditModal(allWords[+btn.dataset.index]);});});
-  el.querySelectorAll('.edit-btn.del').forEach(function(btn){btn.addEventListener('click',function(){deleteWord(allWords[+btn.dataset.index]);});});
+
 }
 
 function openEditModal(w) {
@@ -1144,7 +1110,6 @@ document.querySelectorAll('.nav-item').forEach(function(item){
     if(page==='ref')  renderRefPage();
     if(page==='admin'){
       checkAdminAuth(function(){
-        populateSourceSelect();
         renderEditList();
       });
     }
@@ -1440,8 +1405,14 @@ document.getElementById('statsLoadBtn').addEventListener('click', function() {
 
 function buildStatsHTML(data) {
   var top   = data.top   || [];
-  var zeros = data.zeros || [];
   var total = data.total || 0;
+
+  // data.zeros はGASが「0件ヒットのクエリのみ」で返す想定
+  // （念のため：resultCount フィールドがあれば 0 のみ表示）
+  var rawZeros = data.zeros || [];
+  var zeros = rawZeros.some(function(r){ return 'resultCount' in r; })
+    ? rawZeros.filter(function(r){ return Number(r.resultCount) === 0; })
+    : rawZeros; // GASが既にフィルタ済みならそのまま使う
 
   if (!total) {
     document.getElementById('statsArea').innerHTML =
@@ -1449,33 +1420,41 @@ function buildStatsHTML(data) {
     return;
   }
 
-  var topRows = top.map(function(r, i) {
-    return '<div class="stats-row">' +
-      '<span class="stats-rank">' + (i+1) + '.</span>' +
-      '<span class="stats-query">' + esc(r.query) + '</span>' +
-      '<span class="stats-count">' + r.count + '回</span></div>';
-  }).join('');
+  // ── 検索ランキング ──
+  var topRows = top.length
+    ? top.map(function(r, i) {
+        return '<div class="stats-row">' +
+          '<span class="stats-rank">' + (i+1) + '.</span>' +
+          '<span class="stats-query">' + esc(r.query) + '</span>' +
+          '<span class="stats-count">' + r.count + '回</span></div>';
+      }).join('')
+    : '<div style="font-size:12px;color:var(--ink-muted);padding:6px">データなし</div>';
 
-  var zeroRows = zeros.map(function(r, i) {
-    return '<div class="stats-row">' +
-      '<span class="stats-rank">' + (i+1) + '.</span>' +
-      '<span class="stats-query stats-zero">' + esc(r.query) + '</span>' +
-      '<span class="stats-count">' + r.count + '回</span></div>';
-  }).join('') || '<div style="font-size:12px;color:var(--ink-muted);padding:6px">なし</div>';
+  // ── 辞書追加候補（0件ヒットのみ）──
+  var zeroRows = zeros.length
+    ? zeros.map(function(r, i) {
+        return '<div class="stats-row">' +
+          '<span class="stats-rank">' + (i+1) + '.</span>' +
+          '<span class="stats-query stats-zero">' + esc(r.query) + '</span>' +
+          '<span class="stats-count">' + r.count + '回検索</span></div>';
+      }).join('')
+    : '<div style="font-size:12px;color:var(--ink-muted);padding:6px">0件ヒットなし ✅</div>';
 
   document.getElementById('statsArea').innerHTML =
     '<div class="stats-total">累計検索回数: <strong>' + total.toLocaleString() + '回</strong></div>' +
-    '<div class="stats-grid">' +
-      '<div>' +
-        '<div class="stats-col-title">🔍 検索ランキング</div>' +
-        topRows +
-      '</div>' +
-      '<div>' +
-        '<div class="stats-col-title">⚠️ 辞書追加候補（0件）</div>' +
-        zeroRows +
-      '</div>' +
+
+    '<div class="stats-section">' +
+      '<div class="stats-col-title">🔍 検索ランキング</div>' +
+      topRows +
     '</div>' +
-    '<button class="stats-load-btn" style="margin-top:12px" onclick="location.reload()">🔄 更新</button>';
+
+    '<div class="stats-section" style="margin-top:16px">' +
+      '<div class="stats-col-title">⚠️ 辞書追加候補' +
+        '<span style="font-size:11px;font-weight:400;color:var(--ink-muted)">（0件ヒットのみ）</span></div>' +
+      zeroRows +
+    '</div>' +
+
+    '<button class="stats-load-btn" style="margin-top:14px" onclick="document.getElementById(&quot;statsLoadBtn&quot;).click()">🔄 再読み込み</button>';
 }
 
 // ─ 起動 ─
