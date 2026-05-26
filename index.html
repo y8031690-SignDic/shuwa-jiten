@@ -118,9 +118,45 @@ a { color: inherit; text-decoration: none; }
 .result-meta { font-size: 12px; color: var(--ink-muted); margin: 10px 0 6px; }
 .result-meta strong { color: var(--forest); font-family: var(--font-mono); }
 
-/* ─ 検索初期状態 ─ */
-.search-empty { text-align: center; padding: 60px 16px; color: var(--ink-muted); font-size: 14px; line-height: 2; }
-.search-empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+/* ─ 検索初期状態（使い方ガイド） ─ */
+.search-empty { padding: 14px 0 24px; }
+
+/* タイピングアニメーション */
+.typing-wrap { position: relative; margin: 12px 0 18px; }
+.typing-demo {
+  background: var(--white); border: 2px solid var(--lime);
+  border-radius: var(--radius); padding: 11px 14px 11px 42px;
+  font-size: 15px; color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(124,179,66,0.12), var(--shadow);
+  min-height: 46px; display: flex; align-items: center;
+}
+.typing-icon-pos { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+.typing-text { border-right: 2px solid var(--forest); padding-right: 2px; animation: blink 0.9s step-end infinite; white-space: nowrap; }
+.typing-label { font-size: 11px; color: var(--ink-muted); margin-left: 6px; }
+@keyframes blink { 50% { border-color: transparent; } }
+
+/* 使い方カード */
+.guide-cards { display: flex; flex-direction: column; gap: 9px; margin-bottom: 10px; }
+.guide-card {
+  background: var(--white); border: 1.5px solid var(--line);
+  border-left: 4px solid var(--lime); border-radius: var(--radius);
+  padding: 13px 15px; box-shadow: var(--shadow);
+  display: flex; align-items: flex-start; gap: 12px;
+  animation: fadeUp 0.35s ease both;
+}
+.guide-card:nth-child(2) { animation-delay: 0.07s; border-left-color: var(--teal); }
+.guide-card:nth-child(3) { animation-delay: 0.14s; border-left-color: var(--amber); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.guide-icon { font-size: 26px; flex-shrink: 0; margin-top: 1px; }
+.guide-title { font-size: 13px; font-weight: 900; color: var(--forest); font-family: var(--font-display); margin-bottom: 3px; }
+.guide-desc  { font-size: 12px; color: var(--ink-mid); line-height: 1.65; }
+.guide-tag   { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--lime-light); color: var(--forest); border: 1px solid var(--line); margin-top: 5px; font-family: var(--font-mono); }
+.guide-tag.teal  { background: var(--teal-light); color: var(--teal); }
+.guide-tag.amber { background: var(--amber-light); color: #78350f; }
+.guide-hint { text-align: center; font-size: 11px; color: var(--ink-muted); margin-top: 10px; line-height: 1.8; }
 
 /* ─ 結果リスト（フラット行） ─ */
 .result-list { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
@@ -314,9 +350,50 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   <div class="error-banner" id="errorBanner"></div>
 
   <div id="searchArea">
-    <div class="search-empty">
-      <span class="search-empty-icon">🤟</span>
-      単語名・よみ・カテゴリを入力して<br>検索してください
+    <div class="search-empty" id="searchGuide">
+
+      <!-- タイピングアニメーション -->
+      <div class="typing-wrap">
+        <span class="typing-icon-pos">🔍</span>
+        <div class="typing-demo">
+          <span class="typing-text" id="typingText"></span>
+          <span class="typing-label">と入力してみましょう</span>
+        </div>
+      </div>
+
+      <!-- 使い方カード 3枚 -->
+      <div class="guide-cards">
+        <div class="guide-card">
+          <div class="guide-icon">⌨️</div>
+          <div>
+            <div class="guide-title">キーワードで検索</div>
+            <div class="guide-desc">単語名・よみ・カテゴリで絞り込めます。<br>ひらがな・カタカナ・漢字どれでもOKです。</div>
+            <span class="guide-tag">例：いぬ　イヌ　犬　動物</span>
+          </div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-icon">🔤</div>
+          <div>
+            <div class="guide-title">あいうえお順で探す</div>
+            <div class="guide-desc">上の検索バー下のタブを「あいうえお」に切り替えると、行グループ → 個別かなの2段階で絞り込めます。</div>
+            <span class="guide-tag teal">あ〜お → あ・い・う・え・お</span>
+          </div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-icon">⭐</div>
+          <div>
+            <div class="guide-title">お気に入り・学習記録</div>
+            <div class="guide-desc">単語をタップして詳細を開くと、お気に入り追加・学習済みマークができます。</div>
+            <span class="guide-tag amber">タップ → 詳細 → ☆ / ✅</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-hint">
+        🤟 日本手話の動画リンクつき単語集です<br>
+        単語をタップすると動画を開けます
+      </div>
+
     </div>
   </div>
 
@@ -952,14 +1029,54 @@ document.getElementById('nextBtn').addEventListener('click',function(){
 // ═══════════════════════════════════════════════════════════════
 var searchInput = document.getElementById('searchInput');
 var searchClear = document.getElementById('searchClear');
+// ═══════════════════════════════════════════════════════════════
+//  JS: タイピングアニメーション
+// ═══════════════════════════════════════════════════════════════
+var TYPING_WORDS = ['犬','いぬ','あいさつ','医療','家族','動物','手話','食べ物'];
+var _typingIdx = 0, _typingTimer = null;
+
+function startTypingAnimation() {
+  var el = document.getElementById('typingText');
+  if (!el) return;
+  var word = TYPING_WORDS[_typingIdx % TYPING_WORDS.length];
+  var i = 0;
+  el.textContent = '';
+  function typeIn() {
+    if (i <= word.length) { el.textContent = word.slice(0, i++); _typingTimer = setTimeout(typeIn, 120); }
+    else { _typingTimer = setTimeout(typeOut, 1200); }
+  }
+  function typeOut() {
+    if (i > 0) { el.textContent = word.slice(0, --i); _typingTimer = setTimeout(typeOut, 70); }
+    else { _typingIdx++; _typingTimer = setTimeout(startTypingAnimation, 350); }
+  }
+  typeIn();
+}
+function stopTypingAnimation() {
+  clearTimeout(_typingTimer);
+  var el = document.getElementById('typingText');
+  if (el) el.textContent = '';
+}
+
 searchInput.addEventListener('input', function(){
   currentQuery = searchInput.value.trim();
-  searchClear.style.display = currentQuery?'block':'none';
+  searchClear.style.display = currentQuery ? 'block' : 'none';
+  var guide = document.getElementById('searchGuide');
+  if (currentQuery) {
+    stopTypingAnimation();
+    if (guide) guide.style.display = 'none';
+  } else {
+    if (guide) guide.style.display = '';
+    startTypingAnimation();
+  }
   applyFilter();
 });
 searchClear.addEventListener('click', function(){
-  searchInput.value=''; currentQuery='';
-  searchClear.style.display='none'; applyFilter();
+  searchInput.value = ''; currentQuery = '';
+  searchClear.style.display = 'none';
+  var guide = document.getElementById('searchGuide');
+  if (guide) guide.style.display = '';
+  startTypingAnimation();
+  applyFilter();
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1494,6 +1611,7 @@ function buildStatsHTML(data) {
 // ─ 起動 ─
 init();
 initKanaGrid();
+startTypingAnimation();
 </script>
 </body>
 </html>
