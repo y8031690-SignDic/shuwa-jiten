@@ -118,45 +118,9 @@ a { color: inherit; text-decoration: none; }
 .result-meta { font-size: 12px; color: var(--ink-muted); margin: 10px 0 6px; }
 .result-meta strong { color: var(--forest); font-family: var(--font-mono); }
 
-/* ─ 検索初期状態（使い方ガイド） ─ */
-.search-empty { padding: 14px 0 24px; }
-
-/* タイピングアニメーション */
-.typing-wrap { position: relative; margin: 12px 0 18px; }
-.typing-demo {
-  background: var(--white); border: 2px solid var(--lime);
-  border-radius: var(--radius); padding: 11px 14px 11px 42px;
-  font-size: 15px; color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(124,179,66,0.12), var(--shadow);
-  min-height: 46px; display: flex; align-items: center;
-}
-.typing-icon-pos { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
-.typing-text { border-right: 2px solid var(--forest); padding-right: 2px; animation: blink 0.9s step-end infinite; white-space: nowrap; }
-.typing-label { font-size: 11px; color: var(--ink-muted); margin-left: 6px; }
-@keyframes blink { 50% { border-color: transparent; } }
-
-/* 使い方カード */
-.guide-cards { display: flex; flex-direction: column; gap: 9px; margin-bottom: 10px; }
-.guide-card {
-  background: var(--white); border: 1.5px solid var(--line);
-  border-left: 4px solid var(--lime); border-radius: var(--radius);
-  padding: 13px 15px; box-shadow: var(--shadow);
-  display: flex; align-items: flex-start; gap: 12px;
-  animation: fadeUp 0.35s ease both;
-}
-.guide-card:nth-child(2) { animation-delay: 0.07s; border-left-color: var(--teal); }
-.guide-card:nth-child(3) { animation-delay: 0.14s; border-left-color: var(--amber); }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.guide-icon { font-size: 26px; flex-shrink: 0; margin-top: 1px; }
-.guide-title { font-size: 13px; font-weight: 900; color: var(--forest); font-family: var(--font-display); margin-bottom: 3px; }
-.guide-desc  { font-size: 12px; color: var(--ink-mid); line-height: 1.65; }
-.guide-tag   { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--lime-light); color: var(--forest); border: 1px solid var(--line); margin-top: 5px; font-family: var(--font-mono); }
-.guide-tag.teal  { background: var(--teal-light); color: var(--teal); }
-.guide-tag.amber { background: var(--amber-light); color: #78350f; }
-.guide-hint { text-align: center; font-size: 11px; color: var(--ink-muted); margin-top: 10px; line-height: 1.8; }
+/* ─ 検索初期状態 ─ */
+.search-empty { text-align: center; padding: 60px 16px; color: var(--ink-muted); font-size: 14px; line-height: 2; }
+.search-empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
 
 /* ─ 結果リスト（フラット行） ─ */
 .result-list { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
@@ -269,6 +233,21 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .channel-op   { font-size:11px; color:var(--ink-muted); margin-top:2px; }
 .channel-cefr { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; background:var(--lime-light); color:var(--forest); font-family:var(--font-mono); border:1px solid var(--line); margin-top:6px; }
 .channel-note { font-size:12px; color:var(--ink-mid); margin-top:6px; line-height:1.6; }
+/* ─ 検索タブ ─ */
+.search-tabs { display: flex; gap: 0; margin: 12px 0 0; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); background: var(--white); box-shadow: var(--shadow); }
+.search-tab { flex: 1; padding: 11px 8px; font-size: 14px; font-weight: 700; color: var(--ink-muted); background: var(--white); border: none; cursor: pointer; transition: all 0.15s; font-family: var(--font-display); letter-spacing: 0.02em; }
+.search-tab:first-child { border-right: 1.5px solid var(--line); }
+.search-tab.active { background: var(--forest); color: #fff; }
+.search-tab:hover:not(.active) { background: var(--lime-light); color: var(--forest); }
+
+/* ─ 2段階かなナビ ─ */
+.kana-row-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.kana-row-btn { padding: 12px 4px; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--forest); font-family: var(--font-display); transition: all 0.15s; }
+.kana-row-btn:hover, .kana-row-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+.kana-detail-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; padding: 12px; background: var(--lime-light); border-radius: var(--radius-sm); border: 1.5px solid var(--line); }
+.kana-detail-btn { padding: 10px 16px; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; color: var(--forest); font-family: var(--font-display); transition: all 0.15s; min-width: 48px; text-align: center; }
+.kana-detail-btn:hover, .kana-detail-btn.active { background: var(--lime); color: #fff; border-color: var(--lime); }
+
 .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--forest); color: #fff; font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 24px; opacity: 0; pointer-events: none; z-index: 999; white-space: nowrap; transition: opacity 0.22s; box-shadow: var(--shadow-md); }
 .toast.show { opacity: 1; }
 .loading { text-align: center; padding: 40px 16px; color: var(--ink-muted); font-size: 14px; }
@@ -336,72 +315,64 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      HTML: 検索ページ
      ═══════════════════════════════════════════════════════════════ -->
 <div class="page active" id="page-search">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" id="searchInput" type="search"
-           placeholder="単語名・よみ（かな・カタカナ）・カテゴリで検索…" autocomplete="off">
-    <button class="search-clear" id="searchClear">✕</button>
+
+  <!-- タブ切り替え -->
+  <div class="search-tabs">
+    <button class="search-tab active" id="tabKeyword" onclick="switchSearchTab('keyword')">🔍 キーワード</button>
+    <button class="search-tab" id="tabAiueo" onclick="switchSearchTab('aiueo')">🔤 あいうえお</button>
   </div>
 
-  <div class="cache-bar" id="cacheBar">
-    <span id="cacheMsg"></span>
-    <button class="cache-bar-clear" id="cacheClearBtn">再取得</button>
-  </div>
-  <div class="error-banner" id="errorBanner"></div>
+  <!-- ── キーワード検索パネル ── -->
+  <div id="panelKeyword">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" type="search"
+             placeholder="単語名・よみ（かな・カタカナ）・カテゴリで検索…" autocomplete="off">
+      <button class="search-clear" id="searchClear">✕</button>
+    </div>
 
-  <div id="searchArea">
-    <div class="search-empty" id="searchGuide">
+    <div class="cache-bar" id="cacheBar">
+      <span id="cacheMsg"></span>
+      <button class="cache-bar-clear" id="cacheClearBtn">再取得</button>
+    </div>
+    <div class="error-banner" id="errorBanner"></div>
 
-      <!-- タイピングアニメーション -->
-      <div class="typing-wrap">
-        <span class="typing-icon-pos">🔍</span>
-        <div class="typing-demo">
-          <span class="typing-text" id="typingText"></span>
-          <span class="typing-label">と入力してみましょう</span>
-        </div>
+    <div id="searchArea">
+      <div class="search-empty">
+        <span class="search-empty-icon">🤟</span>
+        単語名・よみ・カテゴリを入力して<br>検索してください
       </div>
+    </div>
 
-      <!-- 使い方カード 3枚 -->
-      <div class="guide-cards">
-        <div class="guide-card">
-          <div class="guide-icon">⌨️</div>
-          <div>
-            <div class="guide-title">キーワードで検索</div>
-            <div class="guide-desc">単語名・よみ・カテゴリで絞り込めます。<br>ひらがな・カタカナ・漢字どれでもOKです。</div>
-            <span class="guide-tag">例：いぬ　イヌ　犬　動物</span>
-          </div>
-        </div>
-        <div class="guide-card">
-          <div class="guide-icon">🔤</div>
-          <div>
-            <div class="guide-title">あいうえお順で探す</div>
-            <div class="guide-desc">上の検索バー下のタブを「あいうえお」に切り替えると、行グループ → 個別かなの2段階で絞り込めます。</div>
-            <span class="guide-tag teal">あ〜お → あ・い・う・え・お</span>
-          </div>
-        </div>
-        <div class="guide-card">
-          <div class="guide-icon">⭐</div>
-          <div>
-            <div class="guide-title">お気に入り・学習記録</div>
-            <div class="guide-desc">単語をタップして詳細を開くと、お気に入り追加・学習済みマークができます。</div>
-            <span class="guide-tag amber">タップ → 詳細 → ☆ / ✅</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="guide-hint">
-        🤟 日本手話の動画リンクつき単語集です<br>
-        単語をタップすると動画を開けます
-      </div>
-
+    <div class="pagination" id="pagination">
+      <button class="btn-page" id="prevBtn">← 前へ</button>
+      <div class="page-info" id="pageInfo">1 / 1</div>
+      <button class="btn-page" id="nextBtn">次へ →</button>
     </div>
   </div>
 
-  <div class="pagination" id="pagination">
-    <button class="btn-page" id="prevBtn">← 前へ</button>
-    <div class="page-info" id="pageInfo">1 / 1</div>
-    <button class="btn-page" id="nextBtn">次へ →</button>
+  <!-- ── あいうえお順パネル ── -->
+  <div id="panelAiueo" style="display:none">
+    <!-- 第1段階：行グループ -->
+    <div class="kana-row-group" id="kanaRowGroup">
+      <button class="kana-row-btn" data-row="あ">あ〜お</button>
+      <button class="kana-row-btn" data-row="か">か〜こ</button>
+      <button class="kana-row-btn" data-row="さ">さ〜そ</button>
+      <button class="kana-row-btn" data-row="た">た〜と</button>
+      <button class="kana-row-btn" data-row="な">な〜の</button>
+      <button class="kana-row-btn" data-row="は">は〜ほ</button>
+      <button class="kana-row-btn" data-row="ま">ま〜も</button>
+      <button class="kana-row-btn" data-row="や">や〜よ</button>
+      <button class="kana-row-btn" data-row="ら">ら〜ろ</button>
+      <button class="kana-row-btn" data-row="わ">わ〜ん</button>
+      <button class="kana-row-btn" data-row="ei">英・数</button>
+    </div>
+    <!-- 第2段階：個別かな -->
+    <div class="kana-detail-group" id="kanaDetailGroup" style="display:none"></div>
+    <!-- 結果表示 -->
+    <div id="kanaResults"></div>
   </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -469,80 +440,6 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     HTML: あいうえお順ページ
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="page" id="page-aiueo">
-  <div class="kana-title">あいうえお順の手話</div>
-
-  <!-- 五十音グリッド -->
-  <div class="kana-grid" id="kanaGrid">
-    <!-- あ行 -->
-    <button class="kana-btn" data-kana="あ">あ</button>
-    <button class="kana-btn" data-kana="か">か</button>
-    <button class="kana-btn" data-kana="さ">さ</button>
-    <button class="kana-btn" data-kana="た">た</button>
-    <button class="kana-btn" data-kana="な">な</button>
-    <button class="kana-btn" data-kana="は">は</button>
-    <button class="kana-btn" data-kana="ま">ま</button>
-    <button class="kana-btn" data-kana="や">や</button>
-    <button class="kana-btn" data-kana="ら">ら</button>
-    <button class="kana-btn" data-kana="わ">わ</button>
-    <!-- い行 -->
-    <button class="kana-btn" data-kana="い">い</button>
-    <button class="kana-btn" data-kana="き">き</button>
-    <button class="kana-btn" data-kana="し">し</button>
-    <button class="kana-btn" data-kana="ち">ち</button>
-    <button class="kana-btn" data-kana="に">に</button>
-    <button class="kana-btn" data-kana="ひ">ひ</button>
-    <button class="kana-btn" data-kana="み">み</button>
-    <button class="kana-btn empty"></button>
-    <button class="kana-btn" data-kana="り">り</button>
-    <button class="kana-btn" data-kana="を">を</button>
-    <!-- う行 -->
-    <button class="kana-btn" data-kana="う">う</button>
-    <button class="kana-btn" data-kana="く">く</button>
-    <button class="kana-btn" data-kana="す">す</button>
-    <button class="kana-btn" data-kana="つ">つ</button>
-    <button class="kana-btn" data-kana="ぬ">ぬ</button>
-    <button class="kana-btn" data-kana="ふ">ふ</button>
-    <button class="kana-btn" data-kana="む">む</button>
-    <button class="kana-btn" data-kana="ゆ">ゆ</button>
-    <button class="kana-btn" data-kana="る">る</button>
-    <button class="kana-btn" data-kana="ん">ん</button>
-    <!-- え行 -->
-    <button class="kana-btn" data-kana="え">え</button>
-    <button class="kana-btn" data-kana="け">け</button>
-    <button class="kana-btn" data-kana="せ">せ</button>
-    <button class="kana-btn" data-kana="て">て</button>
-    <button class="kana-btn" data-kana="ね">ね</button>
-    <button class="kana-btn" data-kana="へ">へ</button>
-    <button class="kana-btn" data-kana="め">め</button>
-    <button class="kana-btn empty"></button>
-    <button class="kana-btn" data-kana="れ">れ</button>
-    <button class="kana-btn empty"></button>
-    <!-- お行 -->
-    <button class="kana-btn" data-kana="お">お</button>
-    <button class="kana-btn" data-kana="こ">こ</button>
-    <button class="kana-btn" data-kana="そ">そ</button>
-    <button class="kana-btn" data-kana="と">と</button>
-    <button class="kana-btn" data-kana="の">の</button>
-    <button class="kana-btn" data-kana="ほ">ほ</button>
-    <button class="kana-btn" data-kana="も">も</button>
-    <button class="kana-btn" data-kana="よ">よ</button>
-    <button class="kana-btn" data-kana="ろ">ろ</button>
-    <button class="kana-btn empty"></button>
-  </div>
-
-  <!-- 英・数ボタン -->
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <button class="eisuu-btn" id="eiBtnEi" style="flex:1">英（A B C …）</button>
-    <button class="eisuu-btn" id="eiBtnSu" style="flex:1">数（1 2 3 …）</button>
-  </div>
-
-  <!-- 結果表示 -->
-  <div id="kanaResults"></div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      HTML: 利用規約・クレジットページ
@@ -649,7 +546,6 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 
 <nav class="bottom-nav">
   <div class="nav-item active" data-page="search"><div class="nav-icon">🔍</div><div>検索</div></div>
-  <div class="nav-item" data-page="aiueo"><div class="nav-icon">🔤</div><div>あいうえお</div></div>
   <div class="nav-item" data-page="fav"><div class="nav-icon">⭐</div><div>お気に入り</div></div>
   <div class="nav-item" data-page="ref"><div class="nav-icon">📺</div><div>参考</div></div>
   <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>記録</div></div>
@@ -1029,54 +925,14 @@ document.getElementById('nextBtn').addEventListener('click',function(){
 // ═══════════════════════════════════════════════════════════════
 var searchInput = document.getElementById('searchInput');
 var searchClear = document.getElementById('searchClear');
-// ═══════════════════════════════════════════════════════════════
-//  JS: タイピングアニメーション
-// ═══════════════════════════════════════════════════════════════
-var TYPING_WORDS = ['犬','いぬ','あいさつ','医療','家族','動物','手話','食べ物'];
-var _typingIdx = 0, _typingTimer = null;
-
-function startTypingAnimation() {
-  var el = document.getElementById('typingText');
-  if (!el) return;
-  var word = TYPING_WORDS[_typingIdx % TYPING_WORDS.length];
-  var i = 0;
-  el.textContent = '';
-  function typeIn() {
-    if (i <= word.length) { el.textContent = word.slice(0, i++); _typingTimer = setTimeout(typeIn, 120); }
-    else { _typingTimer = setTimeout(typeOut, 1200); }
-  }
-  function typeOut() {
-    if (i > 0) { el.textContent = word.slice(0, --i); _typingTimer = setTimeout(typeOut, 70); }
-    else { _typingIdx++; _typingTimer = setTimeout(startTypingAnimation, 350); }
-  }
-  typeIn();
-}
-function stopTypingAnimation() {
-  clearTimeout(_typingTimer);
-  var el = document.getElementById('typingText');
-  if (el) el.textContent = '';
-}
-
 searchInput.addEventListener('input', function(){
   currentQuery = searchInput.value.trim();
-  searchClear.style.display = currentQuery ? 'block' : 'none';
-  var guide = document.getElementById('searchGuide');
-  if (currentQuery) {
-    stopTypingAnimation();
-    if (guide) guide.style.display = 'none';
-  } else {
-    if (guide) guide.style.display = '';
-    startTypingAnimation();
-  }
+  searchClear.style.display = currentQuery?'block':'none';
   applyFilter();
 });
 searchClear.addEventListener('click', function(){
-  searchInput.value = ''; currentQuery = '';
-  searchClear.style.display = 'none';
-  var guide = document.getElementById('searchGuide');
-  if (guide) guide.style.display = '';
-  startTypingAnimation();
-  applyFilter();
+  searchInput.value=''; currentQuery='';
+  searchClear.style.display='none'; applyFilter();
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1370,45 +1226,59 @@ var KANA_MAP = {
   'わ':'ワ','を':'ヲ','ん':'ン'
 };
 
-var selectedKana = null; // 選択中のかな（nullなら未選択）
+var selectedKana = null;
 
-function initKanaGrid() {
-  // かなボタンのクリック
-  document.querySelectorAll('.kana-btn[data-kana]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var kana = btn.dataset.kana;
-      setKanaActive(btn, kana);
-      renderKanaResults(kana, false);
-    });
-  });
-
-  // 英ボタン
-  document.getElementById('eiBtnEi').addEventListener('click', function() {
-    document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.getElementById('eiBtnEi').classList.toggle('active');
-    document.getElementById('eiBtnSu').classList.remove('active');
-    if(document.getElementById('eiBtnEi').classList.contains('active')){
-      selectedKana = '英'; renderKanaResults(null, '英');
-    } else { selectedKana=null; document.getElementById('kanaResults').innerHTML=''; }
-  });
-
-  // 数ボタン
-  document.getElementById('eiBtnSu').addEventListener('click', function() {
-    document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.getElementById('eiBtnSu').classList.toggle('active');
-    document.getElementById('eiBtnEi').classList.remove('active');
-    if(document.getElementById('eiBtnSu').classList.contains('active')){
-      selectedKana = '数'; renderKanaResults(null, '数');
-    } else { selectedKana=null; document.getElementById('kanaResults').innerHTML=''; }
-  });
+// 検索タブ切り替え
+function switchSearchTab(tab) {
+  var isKeyword = tab === 'keyword';
+  document.getElementById('tabKeyword').classList.toggle('active', isKeyword);
+  document.getElementById('tabAiueo').classList.toggle('active', !isKeyword);
+  document.getElementById('panelKeyword').style.display = isKeyword ? '' : 'none';
+  document.getElementById('panelAiueo').style.display  = isKeyword ? 'none' : '';
 }
 
-function setKanaActive(btn, kana) {
-  document.querySelectorAll('.kana-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('eiBtnEi').classList.remove('active');
-  document.getElementById('eiBtnSu').classList.remove('active');
-  btn.classList.add('active');
-  selectedKana = kana;
+var KANA_ROWS = {
+  'あ': ['あ','い','う','え','お'],
+  'か': ['か','き','く','け','こ'],
+  'さ': ['さ','し','す','せ','そ'],
+  'た': ['た','ち','つ','て','と'],
+  'な': ['な','に','ぬ','ね','の'],
+  'は': ['は','ひ','ふ','へ','ほ'],
+  'ま': ['ま','み','む','め','も'],
+  'や': ['や','ゆ','よ'],
+  'ら': ['ら','り','る','れ','ろ'],
+  'わ': ['わ','を','ん'],
+  'ei': ['英','数']
+};
+
+function initKanaGrid() {
+  var rowGroup    = document.getElementById('kanaRowGroup');
+  var detailGroup = document.getElementById('kanaDetailGroup');
+  rowGroup.querySelectorAll('.kana-row-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      // 第1段階アクティブ
+      rowGroup.querySelectorAll('.kana-row-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var kanas = KANA_ROWS[btn.dataset.row] || [];
+      // 第2段階ボタン生成
+      detailGroup.innerHTML = '';
+      kanas.forEach(function(kana) {
+        var b = document.createElement('button');
+        b.className = 'kana-detail-btn';
+        b.textContent = kana;
+        b.addEventListener('click', function() {
+          detailGroup.querySelectorAll('.kana-detail-btn').forEach(function(x){ x.classList.remove('active'); });
+          b.classList.add('active');
+          if (kana === '英') { renderKanaResults(null, '英'); }
+          else if (kana === '数') { renderKanaResults(null, '数'); }
+          else { renderKanaResults(kana, false); }
+        });
+        detailGroup.appendChild(b);
+      });
+      detailGroup.style.display = 'flex';
+      document.getElementById('kanaResults').innerHTML = '';
+    });
+  });
 }
 
 function renderKanaResults(kana, type) {
@@ -1611,7 +1481,6 @@ function buildStatsHTML(data) {
 // ─ 起動 ─
 init();
 initKanaGrid();
-startTypingAnimation();
 </script>
 </body>
 </html>
