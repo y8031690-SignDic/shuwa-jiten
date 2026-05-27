@@ -122,6 +122,18 @@ a { color: inherit; text-decoration: none; }
 .search-empty { text-align: center; padding: 60px 16px; color: var(--ink-muted); font-size: 14px; line-height: 2; }
 .search-empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
 
+/* ─ NewSigns誘導ボタン ─ */
+.newsigns-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 16px; margin-top: 14px;
+  background: #fff8e7; border: 2px solid #f5c842;
+  border-radius: var(--radius); font-size: 14px; font-weight: 700;
+  color: #7a5000; text-decoration: none; transition: background 0.15s, transform 0.1s;
+}
+.newsigns-btn:hover { background: #fff3cc; transform: translateY(-1px); box-shadow: var(--shadow); }
+.newsigns-btn-icon { font-size: 22px; flex-shrink: 0; }
+.newsigns-btn-sub  { font-size: 11px; font-weight: 400; color: var(--ink-muted); display: block; margin-top: 2px; }
+
 /* ─ 結果リスト（フラット行） ─ */
 .result-list { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
 .result-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.12s; gap: 10px; }
@@ -411,6 +423,15 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     </div>
   </div>
 
+  <!-- 行動統計 -->
+  <div class="admin-card">
+    <div class="admin-title">📈 行動統計</div>
+    <div id="actionStatsArea">
+      <button class="stats-load-btn" id="actionStatsLoadBtn">行動統計を読み込む</button>
+    </div>
+  </div>
+
+  <!-- 単語編集 -->
   <div class="admin-card">
     <div class="admin-title">✏️ 単語を編集</div>
     <input class="form-ctrl" id="adminSearch" placeholder="単語を検索…" style="margin-bottom:10px">
@@ -841,7 +862,16 @@ function renderPage() {
 
   var area = document.getElementById('searchArea');
   if(!total){
-    area.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>「'+esc(currentQuery)+'」に一致する単語がありませんでした</div>';
+    var nsUrl = 'https://www.newsigns.jp/search?keyword=' + encodeURIComponent(currentQuery);
+    area.innerHTML =
+      '<div class="empty-state"><span class="empty-icon">🔍</span>「'+esc(currentQuery)+'」に一致する単語がありませんでした</div>' +
+      '<a class="newsigns-btn" href="'+nsUrl+'" target="_blank" rel="noopener" id="newSignsBtn">' +
+        '<span class="newsigns-btn-icon">🔎</span>' +
+        '<span><span>NewSigns.jpで検索してみる</span><span class="newsigns-btn-sub">全国手話研修センター・新しい手話の動画サイト</span></span>' +
+      '</a>';
+    document.getElementById('newSignsBtn').addEventListener('click', function() {
+      gasCall('logNewSignsClick', [{ word: currentQuery }], function(){}, function(){});
+    });
     document.getElementById('pagination').classList.remove('show');
     return;
   }
@@ -927,6 +957,8 @@ searchClear.addEventListener('click', function(){
 // ═══════════════════════════════════════════════════════════════
 function openSheet(row) {
   currentSheet = row;
+  // 単語タップログ送信
+  gasCall('logWordTap', [{ word: row.word, reading: row.reading, category: row.category }], function(){}, function(){});
   document.getElementById('sheetWord').textContent    = row.word;
   document.getElementById('sheetReading').textContent = row.reading;
 
@@ -975,9 +1007,11 @@ document.getElementById('overlay').addEventListener('click',function(e){
 
 document.getElementById('sheetFavBtn').addEventListener('click',function(){
   if(!currentSheet)return; var word=currentSheet.word;
+  var adding = !favSet.has(word);
   favSet.has(word)?favSet.delete(word):favSet.add(word);
   saveFavs(); updateSheetBtns(word); updateStats();
   showToast(favSet.has(word)?'⭐ お気に入りに追加':'お気に入りを解除');
+  gasCall('logFavorite',[{word:word,reading:currentSheet.reading,category:currentSheet.category,action:adding?'add':'remove'}],function(){},function(){});
   // カード行の⭐も更新
   document.querySelectorAll('.row-fav[data-word="'+esc(word)+'"]').forEach(function(btn){
     btn.classList.toggle('active',favSet.has(word));
@@ -1370,6 +1404,16 @@ function buildRefHTML() {
     });
   });
   el.innerHTML = html;
+  // クリックログ
+  el.querySelectorAll('.channel-card').forEach(function(a) {
+    a.addEventListener('click', function() {
+      gasCall('logChannelClick',[{
+        name: a.querySelector('.channel-name') ? a.querySelector('.channel-name').textContent : '',
+        category: a.closest('[data-cat]') ? a.closest('[data-cat]').dataset.cat : '',
+        url: a.href
+      }],function(){},function(){});
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1455,6 +1499,52 @@ function buildStatsHTML(data) {
     '</div>' +
 
     '<button class="stats-load-btn" style="margin-top:14px" onclick="document.getElementById(&quot;statsLoadBtn&quot;).click()">🔄 再読み込み</button>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JS: 行動統計表示
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('actionStatsLoadBtn').addEventListener('click', function() {
+  var btn = document.getElementById('actionStatsLoadBtn');
+  btn.textContent = '読み込み中…'; btn.disabled = true;
+  gasCall('getActionStats', [], function(data) {
+    buildActionStatsHTML(data);
+  }, function(err) {
+    document.getElementById('actionStatsArea').innerHTML =
+      '<div class="error-banner show">❌ ' + (err.message||String(err)) + '</div>';
+  });
+});
+
+function buildActionStatsHTML(data) {
+  function makeRows(list, keyWord, keyCount) {
+    if (!list || !list.length)
+      return '<div style="font-size:12px;color:var(--ink-muted);padding:6px">データなし</div>';
+    return list.map(function(r, i) {
+      return '<div class="stats-row">' +
+        '<span class="stats-rank">' + (i+1) + '.</span>' +
+        '<span class="stats-query">' + esc(r[keyWord]) + '</span>' +
+        '<span class="stats-count">' + r[keyCount] + '回</span></div>';
+    }).join('');
+  }
+
+  document.getElementById('actionStatsArea').innerHTML =
+    '<div class="stats-section">' +
+      '<div class="stats-col-title">👆 単語タップランキング</div>' +
+      makeRows(data.wordTap, 'word', 'count') +
+    '</div>' +
+    '<div class="stats-section" style="margin-top:14px">' +
+      '<div class="stats-col-title">⭐ お気に入りランキング</div>' +
+      makeRows(data.favorite, 'word', 'count') +
+    '</div>' +
+    '<div class="stats-section" style="margin-top:14px">' +
+      '<div class="stats-col-title">🔎 NewSigns誘導クリック</div>' +
+      makeRows(data.newSigns, 'word', 'count') +
+    '</div>' +
+    '<div class="stats-section" style="margin-top:14px">' +
+      '<div class="stats-col-title">📺 参考チャンネルクリック</div>' +
+      makeRows(data.channel, 'name', 'count') +
+    '</div>' +
+    '<button class="stats-load-btn" style="margin-top:14px" onclick="document.getElementById(\'actionStatsLoadBtn\').click()">🔄 再読み込み</button>';
 }
 
 // ─ 起動 ─
