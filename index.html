@@ -957,6 +957,12 @@ searchClear.addEventListener('click', function(){
 // ═══════════════════════════════════════════════════════════════
 function openSheet(row) {
   currentSheet = row;
+  // カードクリック時：タイマー待機中の検索ログを即時確定送信（件数を正確に記録）
+  if (_pendingLogQuery) {
+    clearTimeout(_logTimer);
+    sendSearchLog(_pendingLogQuery, _pendingLogCount);
+    _pendingLogQuery = '';
+  }
   // 単語タップログ送信
   gasCall('logWordTap', [{ word: row.word, reading: row.reading, category: row.category }], function(){}, function(){});
   document.getElementById('sheetWord').textContent    = row.word;
@@ -1430,16 +1436,28 @@ function buildRefHTML() {
 //  JS: 検索ログ（1.5秒後に非同期送信・UIをブロックしない）
 // ═══════════════════════════════════════════════════════════════
 var _logTimer;
+var _pendingLogQuery = '';   // タイマー待機中のクエリを保持
+var _pendingLogCount = 0;   // タイマー待機中の件数を保持
+
+function sendSearchLog(query, count) {
+  if (!query || query.length < 2) return;
+  var referrer = document.referrer || '直接アクセス';
+  // GA4カスタムイベント
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'search', { search_term: query, results_count: count });
+  }
+  // GAS検索ログ（エラーは無視してUIに影響させない）
+  gasCall('logSearch', [query, count, referrer], function(){}, function(){});
+}
+
 function scheduleLog(query, count) {
   clearTimeout(_logTimer);
-  if (!query || query.length < 2) return;
+  if (!query || query.length < 2) { _pendingLogQuery = ''; return; }
+  _pendingLogQuery = query;
+  _pendingLogCount = count;
   _logTimer = setTimeout(function() {
-    // GA4カスタムイベント
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'search', { search_term: query, results_count: count });
-    }
-    // GAS検索ログ（エラーは無視してUIに影響させない）
-    gasCall('logSearch', [query, count], function(){}, function(){});
+    sendSearchLog(query, count);
+    _pendingLogQuery = '';
   }, 1500);
 }
 
