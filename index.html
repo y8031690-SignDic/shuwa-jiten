@@ -964,7 +964,7 @@ function openSheet(row) {
     _pendingLogQuery = '';
   }
   // 単語タップログ送信
-  gasCall('logWordTap', [{ word: row.word, reading: row.reading, category: row.category }], function(){}, function(){});
+  gasCall('logWordTap', [{ word: row.word, reading: row.reading, category: row.category, source: row.src }], function(){}, function(){});
   document.getElementById('sheetWord').textContent    = row.word;
   document.getElementById('sheetReading').textContent = row.reading;
 
