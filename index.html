@@ -539,8 +539,8 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <span class="footer-link" onclick="showPage('terms')">利用規約・クレジット</span>
     <a class="footer-link" href="https://forms.gle/ZB4oPqyEQL1rJArm7" target="_blank" rel="noopener">📬 目安箱</a>
   </div>
-  <div class="footer-copy">© 2025 手話単！ All rights reserved.</div>
-  <div class="footer-ai-credit">※このサイトは、ずぶの素人（Y）に、AIである私（<a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>）が全面的に協力することによって作成されたものです</div>
+  <div class="footer-copy">© 2026 手話単！ All rights reserved.</div>
+  <div class="footer-ai-credit">※このサイトは、ずぶの素人（Y）に、AIである私（<a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>）が全面的に協力することによって作成された</div>
 </div>
 
 </div><!-- /.app -->
@@ -1336,10 +1336,20 @@ function renderKanaResults(kana, type) {
       var urls = w.urls||{};
       var firstSrc = Object.keys(urls)[0];
       if(!firstSrc) return;
+      // ★ gasCall を追加（source付き）
+      var query = w.word;  // 検索ワード
+      var count = Object.keys(urls).length;  // ヒット件数
+      gasCall('logSearch', [query, count, firstSrc], function(){}, function(){});
+
       openSheet({
-        word:w.word, reading:w.reading,
-        cefr:w.cefr, category:w.category, note:w.note,
-        src:firstSrc, url:urls[firstSrc], _wordIndex:w._index
+        word:w.word,
+        reading:w.reading,
+        cefr:w.cefr,
+        category:w.category,
+        note:w.note,
+        src:firstSrc,
+        url:urls[firstSrc],
+        _wordIndex:w._index
       });
     });
   });
