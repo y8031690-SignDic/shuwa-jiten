@@ -862,7 +862,7 @@ function renderPage() {
 
   var area = document.getElementById('searchArea');
   if(!total){
-    var nsUrl = 'https://www.newsigns.jp/search?keyword=' + encodeURIComponent(currentQuery);
+    var nsUrl = 'https://www.newsigns.jp/?search=' + encodeURIComponent(currentQuery);
     area.innerHTML =
       '<div class="empty-state"><span class="empty-icon">🔍</span>「'+esc(currentQuery)+'」に一致する単語がありませんでした</div>' +
       '<a class="newsigns-btn" href="'+nsUrl+'" target="_blank" rel="noopener" id="newSignsBtn">' +
