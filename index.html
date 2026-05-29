@@ -351,6 +351,60 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   color: #666;
 }
 
+/* ── クイズコーナー ── */
+.quiz-locked {
+  text-align: center;
+  padding: 24px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--ink-muted);
+}
+.quiz-locked-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+.quiz-locked-msg  { font-size: 13px; line-height: 1.8; }
+.quiz-locked-prog { font-size: 22px; font-weight: 900; color: var(--forest); font-family: var(--font-mono); margin: 8px 0; }
+.quiz-open {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border: 1.5px solid var(--leaf, #81c784);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.quiz-open-title { font-size: 16px; font-weight: 900; color: var(--forest); margin-bottom: 6px; }
+.quiz-open-sub   { font-size: 12px; color: #666; margin-bottom: 14px; }
+.quiz-start-btn  {
+  background: var(--forest, #2e7d32);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.quiz-start-btn:hover { background: var(--ink); transform: translateY(-1px); }
+
+/* ── クイズ出題画面 ── */
+.quiz-container { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); }
+.quiz-progress  { font-size: 12px; color: var(--ink-muted); margin-bottom: 12px; text-align: center; }
+.quiz-thumbnail { width: 100%; max-width: 320px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto 16px; cursor: pointer; }
+.quiz-thumbnail-wrap { text-align: center; margin-bottom: 4px; }
+.quiz-watch-btn { font-size: 11px; color: var(--teal); text-decoration: underline; cursor: pointer; margin-bottom: 16px; display: inline-block; }
+.quiz-choices   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.quiz-choice    { background: var(--white); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center; }
+.quiz-choice:hover   { border-color: var(--forest); }
+.quiz-choice.correct { background: #e8f5e9; border-color: var(--forest); color: var(--forest); }
+.quiz-choice.wrong   { background: #ffebee; border-color: #e53935; color: #e53935; }
+.quiz-result-msg { text-align: center; font-size: 15px; font-weight: 700; margin: 8px 0; }
+.quiz-next-btn  { width: 100%; background: var(--forest); color: #fff; border: none; border-radius: 50px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.quiz-score     { text-align: center; padding: 24px 16px; }
+.quiz-score-num { font-size: 48px; font-weight: 900; color: var(--forest); font-family: var(--font-mono); }
+.quiz-score-msg { font-size: 14px; color: var(--ink-muted); margin-top: 8px; }
+.quiz-retry-btn { margin-top: 16px; background: var(--forest); color: #fff; border: none; border-radius: 50px; padding: 12px 32px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
 </style>
 </head>
 <body>
@@ -464,6 +518,10 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-label">総単語数</div></div>
   </div>
   <div id="doneList"></div>
+
+  <!-- ── クイズコーナー ── -->
+  <div id="quizSection" style="margin-top:20px"></div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -1136,6 +1194,7 @@ function renderDonePage() {
   el.querySelectorAll('.done-undo').forEach(function(btn){
     btn.addEventListener('click',function(){delete doneMap[btn.dataset.word];saveDone();renderDonePage();updateStats();});
   });
+ renderQuizSection();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1686,6 +1745,164 @@ function showTodaysSign() {
 // ※ allWordsが準備できた後に実行すること
 
 
+// ═══════════════════════════════════════
+//  クイズ機能
+// ═══════════════════════════════════════
+var quizState = { questions: [], current: 0, score: 0 };
+
+function renderQuizSection() {
+  var done = parseInt(document.getElementById('doneCount').textContent) || 0;
+  var fav  = parseInt(document.getElementById('favCount').textContent)  || 0;
+  var total = done + fav;
+  var section = document.getElementById('quizSection');
+  if (!section) return;
+
+  if (total < 100) {
+    // ── ロック状態 ──
+    section.innerHTML =
+      '<div class="quiz-locked">' +
+        '<span class="quiz-locked-icon">🔒</span>' +
+        '<div class="quiz-locked-prog">' + total + ' / 100</div>' +
+        '<div class="quiz-locked-msg">' +
+          '学習済み＋お気に入りが<br>' +
+          '<strong>100件</strong>になるとクイズに挑戦できます！<br>' +
+          'あと <strong>' + (100 - total) + '件</strong> で解放 🎯' +
+        '</div>' +
+      '</div>';
+  } else {
+    // ── 解放状態 ──
+    section.innerHTML =
+      '<div class="quiz-open">' +
+        '<div class="quiz-open-title">🎯 クイズに挑戦！</div>' +
+        '<div class="quiz-open-sub">お気に入り＋学習済みの単語から3問出題</div>' +
+        '<button class="quiz-start-btn" onclick="startQuiz()">▶ スタート</button>' +
+      '</div>';
+  }
+}
+
+function startQuiz() {
+  // 対象単語を集める（お気に入り＋学習済み）
+  var candidates = allWords.filter(function(w) {
+    return favorites[w._index] || doneWords[w._index];
+  });
+  if (candidates.length < 4) {
+    alert('クイズには最低4単語必要です！');
+    return;
+  }
+
+  // 3問分の問題を作成
+  quizState.questions = [];
+  quizState.current   = 0;
+  quizState.score     = 0;
+
+  var shuffled = candidates.slice().sort(function() { return Math.random() - 0.5; });
+  var picked   = shuffled.slice(0, 3);
+
+  picked.forEach(function(correct) {
+    // 不正解の選択肢3つ（全単語からランダム）
+    var wrongs = allWords
+      .filter(function(w) { return w._index !== correct._index; })
+      .sort(function() { return Math.random() - 0.5; })
+      .slice(0, 3);
+
+    var choices = [correct].concat(wrongs)
+      .sort(function() { return Math.random() - 0.5; });
+
+    quizState.questions.push({ correct: correct, choices: choices });
+  });
+
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  var section = document.getElementById('quizSection');
+  var q       = quizState.questions[quizState.current];
+  var num     = quizState.current + 1;
+  var total   = quizState.questions.length;
+
+  // YouTube サムネイル取得
+  var urls     = q.correct.urls || {};
+  var firstSrc = Object.keys(urls)[0];
+  var videoUrl = firstSrc ? urls[firstSrc] : '';
+  var videoId  = '';
+  var m = videoUrl.match(/[?&]v=([^&]+)/);
+  if (m) videoId = m[1];
+  var thumbUrl = videoId
+    ? 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg'
+    : '';
+
+  var choicesHtml = q.choices.map(function(c, i) {
+    return '<button class="quiz-choice" onclick="answerQuiz(' + i + ')">' +
+      esc(c.word) + '</button>';
+  }).join('');
+
+  section.innerHTML =
+    '<div class="quiz-container">' +
+      '<div class="quiz-progress">第' + num + '問 / 全' + total + '問</div>' +
+      '<div class="quiz-thumbnail-wrap">' +
+        (thumbUrl
+          ? '<img class="quiz-thumbnail" src="' + thumbUrl + '" alt="手話動画サムネイル">'
+          : '<div style="width:100%;height:120px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:13px;">動画なし</div>') +
+        (videoUrl ? '<span class="quiz-watch-btn" onclick="window.open(\'' + videoUrl + '\',\'_blank\')">▶ 動画を確認する</span>' : '') +
+      '</div>' +
+      '<div class="quiz-choices">' + choicesHtml + '</div>' +
+    '</div>';
+}
+
+function answerQuiz(index) {
+  var q       = quizState.questions[quizState.current];
+  var chosen  = q.choices[index];
+  var correct = q.correct;
+  var isRight = chosen._index === correct._index;
+  if (isRight) quizState.score++;
+
+  // 正解・不正解を色で表示
+  var buttons = document.querySelectorAll('.quiz-choice');
+  buttons.forEach(function(btn, i) {
+    btn.disabled = true;
+    if (q.choices[i]._index === correct._index) {
+      btn.classList.add('correct');
+    } else if (i === index && !isRight) {
+      btn.classList.add('wrong');
+    }
+  });
+
+  // 結果メッセージ＋次へボタン
+  var container = document.querySelector('.quiz-container');
+  var msg = isRight ? '⭕️ 正解！' : '❌ 不正解… 正解は「' + esc(correct.word) + '」';
+  var nextLabel = quizState.current + 1 < quizState.questions.length
+    ? '次の問題 →'
+    : '結果を見る 🎉';
+
+  container.innerHTML += 
+    '<div class="quiz-result-msg">' + msg + '</div>' +
+    '<button class="quiz-next-btn" onclick="nextQuiz()">' + nextLabel + '</button>';
+}
+
+function nextQuiz() {
+  quizState.current++;
+  if (quizState.current < quizState.questions.length) {
+    renderQuizQuestion();
+  } else {
+    showQuizScore();
+  }
+}
+
+function showQuizScore() {
+  var section = document.getElementById('quizSection');
+  var score   = quizState.score;
+  var total   = quizState.questions.length;
+  var msg     = score === total ? '🎉 全問正解！すごい！'
+              : score >= 2     ? '👍 惜しい！もう少し！'
+              : '💪 もう一度チャレンジしよう！';
+
+  section.innerHTML =
+    '<div class="quiz-score">' +
+      '<div class="quiz-score-num">' + score + ' / ' + total + '</div>' +
+      '<div class="quiz-score-msg">' + msg + '</div>' +
+      '<button class="quiz-retry-btn" onclick="startQuiz()">もう一度！</button>' +
+    '</div>';
+}
 
 // ─ 起動 ─
 init();
