@@ -17,6 +17,11 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap" rel="stylesheet">
 
+
+
+
+
+
 <!-- ═══════════════════════════════════════════════════════════════
      CSS
      ═══════════════════════════════════════════════════════════════ -->
@@ -305,6 +310,47 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .credit-name { font-size: 13px; font-weight: 700; color: var(--forest); }
 .credit-desc { font-size: 12px; color: var(--ink-muted); margin-top: 3px; line-height: 1.6; }
 .credit-link { font-size: 11px; color: var(--teal); text-decoration: underline; margin-top: 4px; display: inline-block; }
+
+/* ── 今日の手話単語カード ── */
+.today-sign-card {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border: 1.5px solid var(--leaf, #81c784);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 8px 0 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.today-sign-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.today-sign-greeting {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+.today-sign-divider {
+  border-top: 1px solid #c8e6c9;
+  margin: 6px 0;
+}
+.today-sign-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+}
+.today-sign-word {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--forest, #2e7d32);
+}
+.today-sign-reading {
+  font-size: 13px;
+  font-weight: 400;
+  color: #666;
+}
+
 </style>
 </head>
 <body>
@@ -336,6 +382,17 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 
   <!-- ── キーワード検索パネル ── -->
   <div id="panelKeyword">
+
+
+   <!-- ── 今日の手話単語 ── -->
+   <div id="todaySignCard" class="today-sign-card">
+     <div id="todayGreeting" class="today-sign-greeting"></div>
+     <div class="today-sign-divider"></div>
+     <div class="today-sign-label">🤟 今日の手話</div>
+     <div id="todayWord" class="today-sign-word"></div>
+   </div>
+
+
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input class="search-input" id="searchInput" type="search"
@@ -1575,9 +1632,65 @@ function buildActionStatsHTML(data) {
     '<button class="stats-load-btn" style="margin-top:14px" onclick="document.getElementById(\'actionStatsLoadBtn\').click()">🔄 再読み込み</button>';
 }
 
+
+// ═══════════════════════════════════════
+//  今日の手話単語
+// ═══════════════════════════════════════
+function showTodaysSign() {
+  if (!allWords || allWords.length === 0) return;
+
+  // 日付シードで全員同じ単語
+  var now     = new Date();
+  var dateNum = now.getFullYear() * 10000
+              + (now.getMonth() + 1) * 100
+              + now.getDate();
+  var word = allWords[dateNum % allWords.length];
+  if (!word) return;
+
+  // 時間帯で挨拶を変える
+  var hour = now.getHours();
+  var greeting;
+  if (hour >= 4 && hour < 11) {
+    greeting = '🌅 おはようございます！';
+  } else if (hour >= 11 && hour < 18) {
+    greeting = '☀️ こんにちは！';
+  } else {
+    greeting = '🌙 こんばんは！';
+  }
+
+  // 表示
+  document.getElementById('todayGreeting').textContent = greeting;
+  document.getElementById('todayWord').innerHTML =
+    esc(word.word) +
+    '<span class="today-sign-reading">（' + esc(word.reading) + '）</span>';
+
+  // クリックで詳細を開く
+  document.getElementById('todaySignCard').onclick = function() {
+    var urls     = word.urls || {};
+    var firstSrc = Object.keys(urls)[0];
+    if (!firstSrc) return;
+    openSheet({
+      word       : word.word,
+      reading    : word.reading,
+      cefr       : word.cefr,
+      category   : word.category,
+      note       : word.note,
+      src        : firstSrc,
+      url        : urls[firstSrc],
+      _wordIndex : word._index
+    });
+  };
+}
+
+// データ読み込み後に呼び出す
+// ※ allWordsが準備できた後に実行すること
+
+
+
 // ─ 起動 ─
 init();
 initKanaGrid();
+showTodaysSign();
 </script>
 </body>
 </html>
