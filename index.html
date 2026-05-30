@@ -1892,30 +1892,3 @@ initKanaGrid();
 </script>
 </body>
 </html>
-else {
-    showQuizScore();
-  }
-}
-
-function showQuizScore() {
-  var section = document.getElementById('quizSection');
-  var score   = quizState.score;
-  var total   = quizState.questions.length;
-  var msg     = score === total ? '🎉 全問正解！すごい！'
-              : score >= 2     ? '👍 惜しい！もう少し！'
-              : '💪 もう一度チャレンジしよう！';
-
-  section.innerHTML =
-    '<div class="quiz-score">' +
-      '<div class="quiz-score-num">' + score + ' / ' + total + '</div>' +
-      '<div class="quiz-score-msg">' + msg + '</div>' +
-      '<button class="quiz-retry-btn" onclick="startQuiz()">もう一度！</button>' +
-    '</div>';
-}
-
-// ─ 起動 ─
-init();
-initKanaGrid();
-</script>
-</body>
-</html>
