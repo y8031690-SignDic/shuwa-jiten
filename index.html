@@ -909,6 +909,7 @@ function onWordsLoaded(data) {
   });
   document.getElementById('headerCount').textContent = allWords.length.toLocaleString()+'語';
   updateStats();
+  showTodaysSign();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1908,7 +1909,6 @@ function showQuizScore() {
 // ─ 起動 ─
 init();
 initKanaGrid();
-showTodaysSign();
 </script>
 </body>
 </html>
