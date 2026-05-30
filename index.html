@@ -14,17 +14,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>手話単！ | 手話学習者のための単語検索</title>
-<!-- ═══════════════════════════════════════════════════════════════
-     Google Analytics 4
-     ★ GA4の測定IDを取得後、G-XXXXXXXXXXを書き換えてください
-     ═══════════════════════════════════════════════════════════════ -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZDM6JOETLJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZDM6JOETLJ');
-</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap" rel="stylesheet">
 
 
@@ -1876,6 +1866,33 @@ function nextQuiz() {
   if (quizState.current < quizState.questions.length) {
     renderQuizQuestion();
   } else {
+    showQuizScore();
+  }
+}
+
+function showQuizScore() {
+  var section = document.getElementById('quizSection');
+  var score   = quizState.score;
+  var total   = quizState.questions.length;
+  var msg     = score === total ? '🎉 全問正解！すごい！'
+              : score >= 2     ? '👍 惜しい！もう少し！'
+              : '💪 もう一度チャレンジしよう！';
+
+  section.innerHTML =
+    '<div class="quiz-score">' +
+      '<div class="quiz-score-num">' + score + ' / ' + total + '</div>' +
+      '<div class="quiz-score-msg">' + msg + '</div>' +
+      '<button class="quiz-retry-btn" onclick="startQuiz()">もう一度！</button>' +
+    '</div>';
+}
+
+// ─ 起動 ─
+init();
+initKanaGrid();
+</script>
+</body>
+</html>
+else {
     showQuizScore();
   }
 }
