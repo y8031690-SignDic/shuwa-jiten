@@ -1682,10 +1682,11 @@ function showTodaysSign() {
 
   // 日付シードで全員同じ単語
   var now     = new Date();
-  var dateNum = now.getFullYear() * 10000
-              + (now.getMonth() + 1) * 100
-              + now.getDate();
-  var word = allWords[dateNum % allWords.length];
+  var d    = now.getDate();
+  var m    = now.getMonth() + 1;
+  var y    = now.getFullYear();
+  var seed = (y * 373 + m * 127 + d * 1009) % allWords.length;
+  var word = allWords[Math.abs(seed)];
   if (!word) return;
 
   // 時間帯で挨拶を変える
