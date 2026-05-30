@@ -902,7 +902,7 @@ function applyFilter() {
   if(!q) {
     // 検索前：初期状態を表示
     document.getElementById('searchArea').innerHTML =
-      '<div class="search-empty"><span class="search-empty-icon">🤟</span>単語名・よみ（かな・カタカナ）を入力して<br>検索してください<div class="search-hint">例：「犬」「イヌ」「いぬ」</div></div>';
+      '<div class="search-empty">単語名・よみ（かな・カタカナ）を入力して<br>検索してください<div class="search-hint">例：「犬」「イヌ」「いぬ」</div></div>';
     document.getElementById('pagination').classList.remove('show');
     return;
   }
