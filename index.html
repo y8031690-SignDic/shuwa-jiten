@@ -1183,7 +1183,10 @@ function renderDonePage() {
   updateStats();
   var entries=Object.entries(doneMap).sort(function(a,b){return b[1].localeCompare(a[1]);});
   var el=document.getElementById('doneList');
-  if(!entries.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>';return;}
+  if(!entries.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>';
+  renderQuizSection();
+  return;
+}
   el.innerHTML=entries.map(function(e){
     return '<div class="done-card">'+
       '<div><div class="done-word">'+esc(e[0])+'</div><div class="done-date">'+e[1]+'</div></div>'+
