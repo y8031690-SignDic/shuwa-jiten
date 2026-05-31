@@ -1,0 +1,26 @@
+name: Update words.json from Drive
+
+on:
+  schedule:
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download JSON from Drive
+        run: |
+          curl -L "https://drive.google.com/uc?export=download&id=${{ secrets.DRIVE_FILE_ID }}" \
+            -o words.json
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add words.json
+          git diff --staged --quiet || git commit -m "chore: update words.json $(date +'%Y-%m-%d')"
+          git push
