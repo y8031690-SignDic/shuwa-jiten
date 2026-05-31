@@ -776,8 +776,9 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      JS: 設定・定数
      ═══════════════════════════════════════════════════════════════ -->
 <script>
-// ★ 再デプロイ後はこのURLを更新すること
-var GAS_URL   = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
+// ★ データ取得先（GitHub Pages）
+var GAS_URL      = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
+var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json';
 
 // ★ 管理者パスワード（変更してください）
 var ADMIN_PASSWORD = 'signdic2026';
@@ -900,29 +901,28 @@ function hiraToKata(str) {
 //  JS: 初期化
 // ═══════════════════════════════════════════════════════════════
 function init() {
-  // カテゴリ一覧（キャッシュ優先）
+  // カテゴリ一覧（単語データから自動生成するためGAS不要）
   var cachedCats = Cache.get(CAT_CACHE_KEY);
   if(cachedCats){ categoryList=cachedCats; buildCategorySelects(); }
-  else{ gasCall('getCategoryList',[],function(cats){ categoryList=cats||[]; Cache.set(CAT_CACHE_KEY,categoryList); buildCategorySelects(); }); }
 
   // 単語一覧（キャッシュ優先）
   var cached = Cache.get(CACHE_KEY);
   if(cached){ showCacheBar(true); onWordsLoaded(cached); }
   else{
     showCacheBar(false);
-    gasCall('getWordList',[],
-      function(data){
+    fetch(WORDS_JSON_URL)
+      .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(data){
         document.getElementById('errorBanner').classList.remove('show');
-        Cache.set(CACHE_KEY,data);
+        Cache.set(CACHE_KEY, data);
         onWordsLoaded(data);
-      },
-      function(err){
+      })
+      .catch(function(err){
         var ban=document.getElementById('errorBanner');
-        ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err.message||String(err))+'<br>→ GAS_URLを確認してください';
+        ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err.message||String(err));
         ban.classList.add('show');
         document.getElementById('cacheBar').classList.remove('show');
-      }
-    );
+      });
   }
 }
 
@@ -939,6 +939,18 @@ function onWordsLoaded(data) {
       urls:     typeof row.urls==='object'?row.urls:{}
     };
   });
+
+  // カテゴリ一覧を単語データから自動生成
+  if(categoryList.length === 0){
+    var catSet = {};
+    allWords.forEach(function(w){
+      if(w.category && !catSet[w.category]) catSet[w.category] = true;
+    });
+    categoryList = Object.keys(catSet).map(function(c){ return {group:'', category:c}; });
+    Cache.set(CAT_CACHE_KEY, categoryList);
+    buildCategorySelects();
+  }
+
   document.getElementById('headerCount').textContent = allWords.length.toLocaleString()+'語';
   updateStats();
   showTodaysSign();
