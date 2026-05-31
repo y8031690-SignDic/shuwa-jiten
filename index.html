@@ -254,10 +254,52 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .channel-note { font-size:12px; color:var(--ink-mid); margin-top:6px; line-height:1.6; }
 /* ─ 検索タブ ─ */
 .search-tabs { display: flex; gap: 0; margin: 12px 0 0; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); background: var(--white); box-shadow: var(--shadow); }
-.search-tab { flex: 1; padding: 11px 8px; font-size: 14px; font-weight: 700; color: var(--ink-muted); background: var(--white); border: none; cursor: pointer; transition: all 0.15s; font-family: var(--font-display); letter-spacing: 0.02em; }
-.search-tab:first-child { border-right: 1.5px solid var(--line); }
+.search-tab { flex: 1; padding: 11px 8px; font-size: 13px; font-weight: 700; color: var(--ink-muted); background: var(--white); border: none; cursor: pointer; transition: all 0.15s; font-family: var(--font-display); letter-spacing: 0.02em; }
+.search-tab:not(:last-child) { border-right: 1.5px solid var(--line); }
 .search-tab.active { background: var(--forest); color: #fff; }
 .search-tab:hover:not(.active) { background: var(--lime-light); color: var(--forest); }
+
+/* ─ カテゴリナビ ─ */
+.cat-group-scroll {
+  display: flex; gap: 8px; overflow-x: auto; padding: 14px 0 4px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.cat-group-scroll::-webkit-scrollbar { display: none; }
+.cat-group-btn {
+  flex-shrink: 0; padding: 8px 14px;
+  background: var(--white); border: 1.5px solid var(--line);
+  border-radius: 20px; font-size: 13px; font-weight: 700;
+  color: var(--ink-mid); white-space: nowrap; transition: all 0.15s;
+  font-family: var(--font-display);
+}
+.cat-group-btn:hover { background: var(--lime-light); border-color: var(--lime); color: var(--forest); }
+.cat-group-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+.cat-items-wrap {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 12px; background: var(--lime-light);
+  border-radius: var(--radius-sm); border: 1.5px solid var(--line);
+  margin-bottom: 14px; min-height: 60px;
+}
+.cat-item-btn {
+  padding: 9px 16px; background: var(--white);
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 700; color: var(--forest);
+  font-family: var(--font-display); transition: all 0.15s;
+}
+.cat-item-btn:hover, .cat-item-btn.active {
+  background: var(--lime); color: #fff; border-color: var(--lime);
+}
+.cat-count-badge {
+  display: inline-block; font-size: 10px; font-family: var(--font-mono);
+  background: rgba(255,255,255,0.35); border-radius: 8px;
+  padding: 1px 5px; margin-left: 4px; vertical-align: middle;
+}
+.cat-results-area { margin-top: 4px; }
+.cat-result-title {
+  font-size: 13px; font-weight: 700; color: var(--forest);
+  margin: 4px 0 8px; display: flex; align-items: center; gap: 6px;
+}
 
 /* ─ 2段階かなナビ ─ */
 .kana-row-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
@@ -413,6 +455,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   <div class="search-tabs">
     <button class="search-tab active" id="tabKeyword" onclick="switchSearchTab('keyword')">🔍 キーワード</button>
     <button class="search-tab" id="tabAiueo" onclick="switchSearchTab('aiueo')">🔤 あいうえお</button>
+    <button class="search-tab" id="tabCategory" onclick="switchSearchTab('category')">📂 カテゴリ</button>
   </div>
 
   <!-- ── キーワード検索パネル ── -->
@@ -475,9 +518,19 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div class="kana-detail-group" id="kanaDetailGroup" style="display:none"></div>
     <!-- 結果表示 -->
     <div id="kanaResults"></div>
+  </div><!-- /#panelAiueo -->
+
+  <!-- ── カテゴリ順パネル ── -->
+  <div id="panelCategory" style="display:none">
+    <!-- グループ横スクロール -->
+    <div class="cat-group-scroll" id="catGroupScroll"></div>
+    <!-- カテゴリボタン -->
+    <div class="cat-items-wrap" id="catItemsWrap"></div>
+    <!-- 結果 -->
+    <div class="cat-results-area" id="catResults"></div>
   </div>
 
-</div>
+</div><!-- /#page-search -->
 
 <!-- ═══════════════════════════════════════════════════════════════
      HTML: お気に入りページ
@@ -1184,7 +1237,11 @@ function renderDonePage() {
 // ═══════════════════════════════════════════════════════════════
 function buildCategorySelects() {
   var sel=document.getElementById('editCategory');
-  sel.innerHTML=categoryList.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
+  // categoryList は [{group, category}] の配列
+  sel.innerHTML=categoryList.map(function(c){
+    var v = typeof c === 'object' ? (c.category||'') : String(c);
+    return '<option value="'+esc(v)+'">'+esc(v)+'</option>';
+  }).join('');
 }
 document.getElementById('adminSearch').addEventListener('input',function(){renderEditList(this.value.trim());});
 
@@ -1333,11 +1390,13 @@ var selectedKana = null;
 
 // 検索タブ切り替え
 function switchSearchTab(tab) {
-  var isKeyword = tab === 'keyword';
-  document.getElementById('tabKeyword').classList.toggle('active', isKeyword);
-  document.getElementById('tabAiueo').classList.toggle('active', !isKeyword);
-  document.getElementById('panelKeyword').style.display = isKeyword ? '' : 'none';
-  document.getElementById('panelAiueo').style.display  = isKeyword ? 'none' : '';
+  document.getElementById('tabKeyword').classList.toggle('active',  tab === 'keyword');
+  document.getElementById('tabAiueo').classList.toggle('active',    tab === 'aiueo');
+  document.getElementById('tabCategory').classList.toggle('active', tab === 'category');
+  document.getElementById('panelKeyword').style.display  = tab === 'keyword'  ? '' : 'none';
+  document.getElementById('panelAiueo').style.display    = tab === 'aiueo'    ? '' : 'none';
+  document.getElementById('panelCategory').style.display = tab === 'category' ? '' : 'none';
+  if (tab === 'category') initCategoryNav();
 }
 
 var KANA_ROWS = {
@@ -1460,7 +1519,170 @@ function renderKanaResults(kana, type) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  JS: 参考チャンネルページ
+//  JS: カテゴリナビ
+// ═══════════════════════════════════════════════════════════════
+var _catNavReady     = false;
+var _catGroupList    = []; // [{group, categories:[{category,count}]}]
+var _selectedGroup   = null;
+var _selectedCat     = null;
+
+// 12グループの表示順・絵文字マップ（GASのpopulateCategorySheetと合わせる）
+var CAT_GROUP_ORDER = [
+  '🗣️ 言語', '👥 人・関係', '🏥 健康・医療', '🏠 日常生活',
+  '🏫 学び・仕事', '⚖️ 社会', '🌍 自然・世界', '🎉 文化・活動',
+  '🚃 場所・移動', '🔢 基礎語彙', '📚 歴史', '❓ その他'
+];
+
+function initCategoryNav() {
+  if (_catNavReady) return;
+
+  // allWords からグループ×カテゴリの集計を作る
+  // categoryList は [{group, category}] の配列
+  if (!categoryList.length) {
+    document.getElementById('catGroupScroll').innerHTML =
+      '<div style="font-size:13px;color:var(--ink-muted);padding:8px">カテゴリ読み込み中…</div>';
+    return;
+  }
+
+  // カテゴリごとの件数カウント
+  var catCount = {};
+  allWords.forEach(function(w) { catCount[w.category] = (catCount[w.category]||0) + 1; });
+
+  // グループ→カテゴリのマップ構築
+  var groupMap = {};
+  categoryList.forEach(function(item) {
+    var g = item.group, c = item.category;
+    if (!g || !c) return;
+    if (!groupMap[g]) groupMap[g] = [];
+    groupMap[g].push({ category: c, count: catCount[c] || 0 });
+  });
+
+  // 表示順に整列
+  _catGroupList = CAT_GROUP_ORDER
+    .filter(function(g) { return groupMap[g]; })
+    .map(function(g) { return { group: g, categories: groupMap[g] }; });
+
+  // 未知のグループも末尾に追加
+  Object.keys(groupMap).forEach(function(g) {
+    if (CAT_GROUP_ORDER.indexOf(g) === -1) {
+      _catGroupList.push({ group: g, categories: groupMap[g] });
+    }
+  });
+
+  buildCatGroupButtons();
+  _catNavReady = true;
+}
+
+function buildCatGroupButtons() {
+  var scroll = document.getElementById('catGroupScroll');
+  scroll.innerHTML = '';
+  _catGroupList.forEach(function(g) {
+    var total = g.categories.reduce(function(s, c) { return s + c.count; }, 0);
+    var btn = document.createElement('button');
+    btn.className = 'cat-group-btn';
+    btn.textContent = g.group;
+    btn.dataset.group = g.group;
+    btn.addEventListener('click', function() {
+      scroll.querySelectorAll('.cat-group-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _selectedGroup = g.group;
+      _selectedCat   = null;
+      buildCatItemButtons(g.categories);
+      document.getElementById('catResults').innerHTML = '';
+      // スクロールしてカテゴリボタンが見えるように
+      document.getElementById('catItemsWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+    scroll.appendChild(btn);
+  });
+}
+
+function buildCatItemButtons(categories) {
+  var wrap = document.getElementById('catItemsWrap');
+  wrap.innerHTML = '';
+  categories.forEach(function(item) {
+    var btn = document.createElement('button');
+    btn.className = 'cat-item-btn';
+    btn.innerHTML = esc(item.category) +
+      '<span class="cat-count-badge">' + item.count.toLocaleString() + '</span>';
+    btn.dataset.cat = item.category;
+    btn.addEventListener('click', function() {
+      wrap.querySelectorAll('.cat-item-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _selectedCat = item.category;
+      renderCatResults(item.category);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function renderCatResults(category) {
+  var words = allWords.filter(function(w) { return w.category === category; });
+  words.sort(function(a, b) {
+    return hiraToKata(a.reading || a.word).localeCompare(hiraToKata(b.reading || b.word), 'ja');
+  });
+
+  var el = document.getElementById('catResults');
+  if (!words.length) {
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>この カテゴリには単語がありません</div>';
+    return;
+  }
+
+  // フラット展開（word × source）
+  var rows = [];
+  words.forEach(function(w) {
+    var urls = w.urls || {};
+    Object.keys(urls).forEach(function(src) {
+      var url = urls[src]; if (!url) return;
+      rows.push({ word: w.word, reading: w.reading, cefr: w.cefr, category: w.category, note: w.note, src: src, url: url, _wordIndex: w._index });
+    });
+  });
+
+  var html =
+    '<div class="cat-result-title">' +
+      esc(category) +
+      ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' + rows.length.toLocaleString() + '件</span>' +
+    '</div>' +
+    '<div class="result-list">' +
+    rows.map(function(row, i) {
+      var label = SOURCE_LABELS[row.src] || row.src;
+      var icon  = SOURCE_EXT[row.src] ? '🔗' : '▶';
+      var isFav = favSet.has(row.word);
+      return '<div class="result-row" data-catidx="' + i + '">' +
+        '<div class="row-word-wrap">' +
+          '<span class="row-word">' + esc(row.word) + '</span>' +
+          '<span class="row-reading">' + esc(row.reading) + '</span>' +
+        '</div>' +
+        '<div class="row-src">' +
+          '<span class="row-src-icon">' + icon + '</span>' +
+          '<span class="row-src-label">' + esc(label) + '</span>' +
+        '</div>' +
+        '<button class="row-fav ' + (isFav ? 'active' : '') + '" data-word="' + esc(row.word) + '">' + (isFav ? '⭐' : '☆') + '</button>' +
+      '</div>';
+    }).join('') +
+    '</div>';
+
+  el.innerHTML = html;
+
+  // イベント登録
+  el.querySelectorAll('.result-row').forEach(function(rowEl) {
+    rowEl.addEventListener('click', function(e) {
+      if (e.target.classList.contains('row-fav')) return;
+      openSheet(rows[+rowEl.dataset.catidx]);
+    });
+  });
+  el.querySelectorAll('.row-fav').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var word = btn.dataset.word;
+      favSet.has(word) ? favSet.delete(word) : favSet.add(word);
+      saveFavs(); updateStats();
+      btn.classList.toggle('active', favSet.has(word));
+      btn.textContent = favSet.has(word) ? '⭐' : '☆';
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
 var channelList  = [];
 var refLoaded    = false;
