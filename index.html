@@ -361,7 +361,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   border: 1.5px solid var(--leaf, #81c784);
   border-radius: 14px;
   padding: 8px 14px;
-  margin: 4px 0 8px;
+  margin: 12px 0 8px;
   cursor: pointer;
   text-align: center;
   gap: 10px;
@@ -451,6 +451,14 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      ═══════════════════════════════════════════════════════════════ -->
 <div class="page active" id="page-search">
 
+  <!-- ── 今日の手話単語 ── -->
+  <div id="todaySignCard" class="today-sign-card">
+    <div id="todayGreeting" class="today-sign-greeting"></div>
+    <div class="today-sign-divider"></div>
+    <div class="today-sign-label">🤟 今日の手話</div>
+    <div id="todayWord" class="today-sign-word"></div>
+  </div>
+
   <!-- タブ切り替え -->
   <div class="search-tabs">
     <button class="search-tab active" id="tabKeyword" onclick="switchSearchTab('keyword')">🔍 キーワード</button>
@@ -460,15 +468,6 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 
   <!-- ── キーワード検索パネル ── -->
   <div id="panelKeyword">
-
-
-   <!-- ── 今日の手話単語 ── -->
-   <div id="todaySignCard" class="today-sign-card">
-     <div id="todayGreeting" class="today-sign-greeting"></div>
-     <div class="today-sign-divider"></div>
-     <div class="today-sign-label">🤟 今日の手話</div>
-     <div id="todayWord" class="today-sign-word"></div>
-   </div>
 
 
     <div class="search-wrap">
