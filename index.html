@@ -1958,13 +1958,20 @@ function buildActionStatsHTML(data) {
 function showTodaysSign() {
   if (!allWords || allWords.length === 0) return;
 
+  // 除外カテゴリ（指文字・数字・歴史は今日の手話に不向き）
+  var EXCLUDE_CATS = ['指文字・数字手話', '歴史・時代・古語'];
+  var candidates = allWords.filter(function(w) {
+    return EXCLUDE_CATS.indexOf(w.category) === -1;
+  });
+  if (!candidates.length) candidates = allWords;
+
   // 日付シードで全員同じ単語
-  var now     = new Date();
+  var now  = new Date();
   var d    = now.getDate();
   var m    = now.getMonth() + 1;
   var y    = now.getFullYear();
-  var seed = (y * 373 + m * 127 + d * 1009) % allWords.length;
-  var word = allWords[Math.abs(seed)];
+  var seed = (y * 373 + m * 127 + d * 1009) % candidates.length;
+  var word = candidates[Math.abs(seed)];
   if (!word) return;
 
   // 時間帯で挨拶を変える
