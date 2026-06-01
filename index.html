@@ -970,16 +970,40 @@ function onWordsLoaded(data) {
     };
   });
 
-  // カテゴリ一覧を単語データから自動生成
-  if(categoryList.length === 0){
-    var catSet = {};
-    allWords.forEach(function(w){
-      if(w.category && !catSet[w.category]) catSet[w.category] = true;
-    });
-    categoryList = Object.keys(catSet).map(function(c){ return {group:'', category:c}; });
-    Cache.set(CAT_CACHE_KEY, categoryList);
-    buildCategorySelects();
-  }
+// カテゴリ一覧を単語データから自動生成
+if(categoryList.length === 0){
+  var GROUP_MAP = {
+    '挨拶・日常表現':'🗣️ 言語', '依頼・確認・応答':'🗣️ 言語',
+    '気持ち・感情':'🗣️ 言語', '副詞・機能語':'🗣️ 言語', '指文字・数字手話':'🗣️ 言語',
+    '家族・親族':'👥 人・関係', '人間関係・社会生活':'👥 人・関係',
+    '人の様子・性格':'👥 人・関係', '人名・サインネーム':'👥 人・関係',
+    '身体・健康':'🏥 健康・医療', '医療・治療':'🏥 健康・医療',
+    '福祉・支援制度':'🏥 健康・医療', 'ろう・難聴・手話文化':'🏥 健康・医療',
+    '食べ物・飲み物・料理':'🏠 日常生活', '衣服・ファッション':'🏠 日常生活',
+    '住まい・家具・家電':'🏠 日常生活', '買い物・お金・家計':'🏠 日常生活',
+    '学校・教育・学習':'🏫 学び・仕事', '仕事・職業・職場':'🏫 学び・仕事', 'IT・デジタル':'🏫 学び・仕事',
+    '法律・政治・行政':'⚖️ 社会', '人権・多様性・共生':'⚖️ 社会',
+    '社会問題・事件・犯罪':'⚖️ 社会', '時事・新語・専門用語':'⚖️ 社会',
+    '地名・国名・地域':'🌍 自然・世界', '気象・自然災害・防災':'🌍 自然・世界',
+    '自然・地形・環境':'🌍 自然・世界', '動物・植物':'🌍 自然・世界',
+    'スポーツ・運動':'🎉 文化・活動', '趣味・芸術・創作':'🎉 文化・活動',
+    '遊び・ゲーム・娯楽':'🎉 文化・活動', '行事・冠婚葬祭':'🎉 文化・活動',
+    '乗り物・交通':'🚃 場所・移動', '場所・施設・建物':'🚃 場所・移動',
+    '数字・量・単位':'🔢 基礎語彙', '時間・時刻・曜日':'🔢 基礎語彙',
+    '日付・月・年・季節':'🔢 基礎語彙', '色・形・大きさ':'🔢 基礎語彙',
+    '動作・行動を表す語':'🔢 基礎語彙', '状態・形容を表す語':'🔢 基礎語彙',
+    '歴史・時代・古語':'📚 歴史', 'その他':'❓ その他'
+  };
+  var catSet = {};
+  allWords.forEach(function(w){
+    if(w.category && !catSet[w.category]) catSet[w.category] = true;
+  });
+  categoryList = Object.keys(catSet).map(function(c){
+    return {group: GROUP_MAP[c] || '❓ その他', category: c};
+  });
+  Cache.set(CAT_CACHE_KEY, categoryList);
+  buildCategorySelects();
+}
 
   document.getElementById('headerCount').textContent = allWords.length.toLocaleString()+'語';
   updateStats();
