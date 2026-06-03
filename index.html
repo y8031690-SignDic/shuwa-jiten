@@ -806,9 +806,11 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      JS: 設定・定数
      ═══════════════════════════════════════════════════════════════ -->
 <script>
-// ★ データ取得先（GitHub Pages）
-var GAS_URL      = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
-var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json';
+// ★ データ取得先
+var GAS_URL        = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
+var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json'; // フォールバック用
+var SUPABASE_URL   = 'https://wlmuwosuzhgcwepjskdv.supabase.co';
+var SUPABASE_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbXV3b3N1emhnY3dlcGpza2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODAzNTIsImV4cCI6MjA5NjA1NjM1Mn0._Vtpg2cZhVKk5FrG92qyt7EUoIeToog7cAgxnsm9JS0';
 
 // ★ 管理者パスワード（変更してください）
 var ADMIN_PASSWORD = 'signdic2026';
@@ -940,33 +942,64 @@ function init() {
   if(cached){ showCacheBar(true); onWordsLoaded(cached); }
   else{
     showCacheBar(false);
-    fetch(WORDS_JSON_URL)
-      .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
+    // Supabaseから全件取得
+    fetchAllFromSupabase()
       .then(function(data){
         document.getElementById('errorBanner').classList.remove('show');
         Cache.set(CACHE_KEY, data);
         onWordsLoaded(data);
       })
       .catch(function(err){
-        var ban=document.getElementById('errorBanner');
-        ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err.message||String(err));
-        ban.classList.add('show');
-        document.getElementById('cacheBar').classList.remove('show');
+        // Supabase失敗時はGitHub JSONにフォールバック
+        fetch(WORDS_JSON_URL)
+          .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
+          .then(function(data){
+            document.getElementById('errorBanner').classList.remove('show');
+            Cache.set(CACHE_KEY, data);
+            onWordsLoaded(data);
+          })
+          .catch(function(err2){
+            var ban=document.getElementById('errorBanner');
+            ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err2.message||String(err2));
+            ban.classList.add('show');
+            document.getElementById('cacheBar').classList.remove('show');
+          });
       });
   }
 }
 
+function fetchAllFromSupabase() {
+  var PAGE = 1000;
+  var all  = [];
+  function fetchPage(from) {
+    return fetch(
+      SUPABASE_URL + '/rest/v1/words?select=*&order=id.asc&offset=' + from + '&limit=' + PAGE,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    )
+    .then(function(r){ if(!r.ok) throw new Error('Supabase HTTP '+r.status); return r.json(); })
+    .then(function(rows){
+      all = all.concat(rows);
+      if(rows.length === PAGE) return fetchPage(from + PAGE);
+      return all;
+    });
+  }
+  return fetchPage(0);
+}
+
 function onWordsLoaded(data) {
   allWords = (data||[]).map(function(row,i){
+    // Supabase（英語キー）とGitHub JSON（日本語キー）の両方に対応
+    var urls = row.urls || row['urls（URL・JSON）'] || {};
+    if(typeof urls === 'string'){ try{ urls=JSON.parse(urls); }catch(e){ urls={}; } }
     return {
       _index:   i,
-      word:     String(row['word（単語名）']           ||''),
-      reading:  String(row['reading（よみ・カタカナ）']  ||''),
-      source:   String(row['source（ソース）']          ||''),
-      note:     String(row['note（補足）']              ||''),
-      cefr:     String(row['cefr（レベル）']            ||''),
-      category: String(row['category（カテゴリ）']      ||''),
-      urls:     typeof row.urls==='object'?row.urls:{}
+      word:     String(row.word     || row['word（単語名）']            || ''),
+      reading:  String(row.reading  || row['reading（よみ・カタカナ）'] || ''),
+      source:   String(row.source   || row['source（ソース）']          || ''),
+      note:     String(row.note     || row['note（補足）']              || ''),
+      cefr:     String(row.cefr     || row['cefr（レベル）']            || ''),
+      category: String(row.category || row['category（カテゴリ）']      || ''),
+      urls:     typeof urls==='object' ? urls : {}
     };
   });
 
