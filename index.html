@@ -562,26 +562,15 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 </div><!-- /#page-search -->
 
 <!-- ═══════════════════════════════════════════════════════════════
-     HTML: お気に入りページ
+     HTML: マイ単語帳ページ
      ═══════════════════════════════════════════════════════════════ -->
 <div class="page" id="page-fav">
-  <div class="page-title">⭐ お気に入り</div>
-  <div id="favList"></div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     HTML: 学習記録ページ
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="page" id="page-done">
-  <div class="page-title">📊 学習記録</div>
+  <div class="page-title">📖 マイ単語帳</div>
   <div class="stat-row">
-    <div class="stat-card"><div class="stat-num" id="doneCount">0</div><div class="stat-label">学習済み</div></div>
-    <div class="stat-card"><div class="stat-num" id="favCount">0</div><div class="stat-label">お気に入り</div></div>
+    <div class="stat-card"><div class="stat-num" id="favCount">0</div><div class="stat-label">登録単語</div></div>
     <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-label">総単語数</div></div>
   </div>
-  <div id="doneList"></div>
-  <!-- ── クイズコーナー ── -->
-  <div id="quizSection" style="margin-top:20px"></div>
+  <div id="favList"></div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -730,9 +719,8 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 
 <nav class="bottom-nav">
   <div class="nav-item active" data-page="search"><div class="nav-icon">🔍</div><div>検索</div></div>
-  <div class="nav-item" data-page="fav"><div class="nav-icon">⭐</div><div>お気に入り</div></div>
+  <div class="nav-item" data-page="fav"><div class="nav-icon">📖</div><div>マイ単語帳</div></div>
   <div class="nav-item" data-page="ref"><div class="nav-icon">📺</div><div>参考</div></div>
-  <div class="nav-item" data-page="done"><div class="nav-icon">📊</div><div>記録</div></div>
   <div class="nav-item" data-page="admin"><div class="nav-icon">⚙️</div><div>管理</div></div>
   <div class="nav-item" data-page="terms"><div class="nav-icon">📄</div><div>規約</div></div>
 </nav>
@@ -757,8 +745,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
       <span class="sheet-link-arrow">→</span>
     </a>
     <div class="sheet-actions">
-      <button class="act-btn" id="sheetFavBtn">☆ お気に入り</button>
-      <button class="act-btn" id="sheetDoneBtn">☑ 学習済みにする</button>
+      <button class="act-btn" id="sheetFavBtn">📖 マイ単語帳に追加</button>
     </div>
     <div class="sheet-note" id="sheetNote" style="display:none"></div>
   </div>
@@ -806,11 +793,9 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
      JS: 設定・定数
      ═══════════════════════════════════════════════════════════════ -->
 <script>
-// ★ データ取得先
-var GAS_URL        = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
-var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json'; // フォールバック用
-var SUPABASE_URL   = 'https://wlmuwosuzhgcwepjskdv.supabase.co';
-var SUPABASE_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbXV3b3N1emhnY3dlcGpza2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODAzNTIsImV4cCI6MjA5NjA1NjM1Mn0._Vtpg2cZhVKk5FrG92qyt7EUoIeToog7cAgxnsm9JS0';
+// ★ データ取得先（GitHub Pages）
+var GAS_URL      = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
+var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json';
 
 // ★ 管理者パスワード（変更してください）
 var ADMIN_PASSWORD = 'signdic2026';
@@ -942,101 +927,46 @@ function init() {
   if(cached){ showCacheBar(true); onWordsLoaded(cached); }
   else{
     showCacheBar(false);
-    // Supabaseから全件取得
-    fetchAllFromSupabase()
+    fetch(WORDS_JSON_URL)
+      .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(data){
         document.getElementById('errorBanner').classList.remove('show');
         Cache.set(CACHE_KEY, data);
         onWordsLoaded(data);
       })
       .catch(function(err){
-        // Supabase失敗時はGitHub JSONにフォールバック
-        fetch(WORDS_JSON_URL)
-          .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
-          .then(function(data){
-            document.getElementById('errorBanner').classList.remove('show');
-            Cache.set(CACHE_KEY, data);
-            onWordsLoaded(data);
-          })
-          .catch(function(err2){
-            var ban=document.getElementById('errorBanner');
-            ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err2.message||String(err2));
-            ban.classList.add('show');
-            document.getElementById('cacheBar').classList.remove('show');
-          });
+        var ban=document.getElementById('errorBanner');
+        ban.innerHTML='❌ <strong>データ読み込みエラー</strong><br>'+(err.message||String(err));
+        ban.classList.add('show');
+        document.getElementById('cacheBar').classList.remove('show');
       });
   }
 }
 
-function fetchAllFromSupabase() {
-  var PAGE = 1000;
-  var all  = [];
-  function fetchPage(from) {
-    return fetch(
-      SUPABASE_URL + '/rest/v1/words?select=*&order=id.asc&offset=' + from + '&limit=' + PAGE,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-    )
-    .then(function(r){ if(!r.ok) throw new Error('Supabase HTTP '+r.status); return r.json(); })
-    .then(function(rows){
-      all = all.concat(rows);
-      if(rows.length === PAGE) return fetchPage(from + PAGE);
-      return all;
-    });
-  }
-  return fetchPage(0);
-}
-
 function onWordsLoaded(data) {
   allWords = (data||[]).map(function(row,i){
-    // Supabase（英語キー）とGitHub JSON（日本語キー）の両方に対応
-    var urls = row.urls || row['urls（URL・JSON）'] || {};
-    if(typeof urls === 'string'){ try{ urls=JSON.parse(urls); }catch(e){ urls={}; } }
     return {
       _index:   i,
-      word:     String(row.word     || row['word（単語名）']            || ''),
-      reading:  String(row.reading  || row['reading（よみ・カタカナ）'] || ''),
-      source:   String(row.source   || row['source（ソース）']          || ''),
-      note:     String(row.note     || row['note（補足）']              || ''),
-      cefr:     String(row.cefr     || row['cefr（レベル）']            || ''),
-      category: String(row.category || row['category（カテゴリ）']      || ''),
-      urls:     typeof urls==='object' ? urls : {}
+      word:     String(row['word（単語名）']           ||''),
+      reading:  String(row['reading（よみ・カタカナ）']  ||''),
+      source:   String(row['source（ソース）']          ||''),
+      note:     String(row['note（補足）']              ||''),
+      cefr:     String(row['cefr（レベル）']            ||''),
+      category: String(row['category（カテゴリ）']      ||''),
+      urls:     typeof row.urls==='object'?row.urls:{}
     };
   });
 
-// カテゴリ一覧を単語データから自動生成
-if(categoryList.length === 0){
-  var GROUP_MAP = {
-    '挨拶・日常表現':'🗣️ 言語', '依頼・確認・応答':'🗣️ 言語',
-    '気持ち・感情':'🗣️ 言語', '副詞・機能語':'🗣️ 言語', '指文字・数字手話':'🗣️ 言語',
-    '家族・親族':'👥 人・関係', '人間関係・社会生活':'👥 人・関係',
-    '人の様子・性格':'👥 人・関係', '人名・サインネーム':'👥 人・関係',
-    '身体・健康':'🏥 健康・医療', '医療・治療':'🏥 健康・医療',
-    '福祉・支援制度':'🏥 健康・医療', 'ろう・難聴・手話文化':'🏥 健康・医療',
-    '食べ物・飲み物・料理':'🏠 日常生活', '衣服・ファッション':'🏠 日常生活',
-    '住まい・家具・家電':'🏠 日常生活', '買い物・お金・家計':'🏠 日常生活',
-    '学校・教育・学習':'🏫 学び・仕事', '仕事・職業・職場':'🏫 学び・仕事', 'IT・デジタル':'🏫 学び・仕事',
-    '法律・政治・行政':'⚖️ 社会', '人権・多様性・共生':'⚖️ 社会',
-    '社会問題・事件・犯罪':'⚖️ 社会', '時事・新語・専門用語':'⚖️ 社会',
-    '地名・国名・地域':'🌍 自然・世界', '気象・自然災害・防災':'🌍 自然・世界',
-    '自然・地形・環境':'🌍 自然・世界', '動物・植物':'🌍 自然・世界',
-    'スポーツ・運動':'🎉 文化・活動', '趣味・芸術・創作':'🎉 文化・活動',
-    '遊び・ゲーム・娯楽':'🎉 文化・活動', '行事・冠婚葬祭':'🎉 文化・活動',
-    '乗り物・交通':'🚃 場所・移動', '場所・施設・建物':'🚃 場所・移動',
-    '数字・量・単位':'🔢 基礎語彙', '時間・時刻・曜日':'🔢 基礎語彙',
-    '日付・月・年・季節':'🔢 基礎語彙', '色・形・大きさ':'🔢 基礎語彙',
-    '動作・行動を表す語':'🔢 基礎語彙', '状態・形容を表す語':'🔢 基礎語彙',
-    '歴史・時代・古語':'📚 歴史', 'その他':'❓ その他'
-  };
-  var catSet = {};
-  allWords.forEach(function(w){
-    if(w.category && !catSet[w.category]) catSet[w.category] = true;
-  });
-  categoryList = Object.keys(catSet).map(function(c){
-    return {group: GROUP_MAP[c] || '❓ その他', category: c};
-  });
-  Cache.set(CAT_CACHE_KEY, categoryList);
-  buildCategorySelects();
-}
+  // カテゴリ一覧を単語データから自動生成
+  if(categoryList.length === 0){
+    var catSet = {};
+    allWords.forEach(function(w){
+      if(w.category && !catSet[w.category]) catSet[w.category] = true;
+    });
+    categoryList = Object.keys(catSet).map(function(c){ return {group:'', category:c}; });
+    Cache.set(CAT_CACHE_KEY, categoryList);
+    buildCategorySelects();
+  }
 
   document.getElementById('headerCount').textContent = allWords.length.toLocaleString()+'語';
   updateStats();
@@ -1239,12 +1169,10 @@ function openSheet(row) {
 }
 
 function updateSheetBtns(word) {
-  var fb=document.getElementById('sheetFavBtn'), db=document.getElementById('sheetDoneBtn');
-  var isFav=favSet.has(word), isDone=!!doneMap[word];
-  fb.className='act-btn'+(isFav?' fav-on':'');
-  db.className='act-btn'+(isDone?' done-on':'');
-  fb.textContent = isFav ?'⭐ お気に入り済み':'☆ お気に入り';
-  db.textContent = isDone?'✅ 学習済み'      :'☑ 学習済みにする';
+  var fb = document.getElementById('sheetFavBtn');
+  var isFav = favSet.has(word);
+  fb.className = 'act-btn' + (isFav ? ' fav-on' : '');
+  fb.textContent = isFav ? '📖 マイ単語帳に登録済み' : '📖 マイ単語帳に追加';
 }
 
 function closeSheet(){
@@ -1261,19 +1189,12 @@ document.getElementById('sheetFavBtn').addEventListener('click',function(){
   var adding = !favSet.has(word);
   favSet.has(word)?favSet.delete(word):favSet.add(word);
   saveFavs(); updateSheetBtns(word); updateStats();
-  showToast(favSet.has(word)?'⭐ お気に入りに追加':'お気に入りを解除');
+  showToast(favSet.has(word)?'📖 マイ単語帳に追加しました':'マイ単語帳から削除しました');
   gasCall('logFavorite',[{word:word,reading:currentSheet.reading,category:currentSheet.category,action:adding?'add':'remove'}],function(){},function(){});
-  // カード行の⭐も更新
   document.querySelectorAll('.row-fav[data-word="'+esc(word)+'"]').forEach(function(btn){
     btn.classList.toggle('active',favSet.has(word));
     btn.textContent=favSet.has(word)?'⭐':'☆';
   });
-});
-document.getElementById('sheetDoneBtn').addEventListener('click',function(){
-  if(!currentSheet)return; var word=currentSheet.word;
-  doneMap[word]?delete doneMap[word]:(doneMap[word]=today());
-  saveDone(); updateSheetBtns(word); updateStats();
-  showToast(doneMap[word]?'✅ 学習済みにしました':'学習記録を解除しました');
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1283,10 +1204,9 @@ function renderFavPage() {
   var favWords = allWords.filter(function(w){return favSet.has(w.word);});
   var el = document.getElementById('favList');
   if(!favWords.length){
-    el.innerHTML='<div class="empty-state"><span class="empty-icon">⭐</span>まだお気に入りがありません</div>';
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">📖</span>まだマイ単語帳に登録がありません</div>';
     return;
   }
-  // お気に入りはフラット展開して表示
   var rows=[];
   favWords.forEach(function(w){
     var urls=w.urls||{};
@@ -1306,28 +1226,6 @@ function renderFavPage() {
   el.querySelectorAll('.fav-row').forEach(function(el,i){
     el.addEventListener('click',function(){openSheet(rows[i]);});
   });
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  JS: 学習記録ページ
-// ═══════════════════════════════════════════════════════════════
-function renderDonePage() {
-  updateStats();
-  var entries=Object.entries(doneMap).sort(function(a,b){return b[1].localeCompare(a[1]);});
-  var el=document.getElementById('doneList');
-  if(!entries.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>';
-  renderQuizSection();
-  return;
-}
-  el.innerHTML=entries.map(function(e){
-    return '<div class="done-card">'+
-      '<div><div class="done-word">'+esc(e[0])+'</div><div class="done-date">'+e[1]+'</div></div>'+
-      '<button class="done-undo" data-word="'+esc(e[0])+'">解除</button></div>';
-  }).join('');
-  el.querySelectorAll('.done-undo').forEach(function(btn){
-    btn.addEventListener('click',function(){delete doneMap[btn.dataset.word];saveDone();renderDonePage();updateStats();});
-  });
- renderQuizSection();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1399,7 +1297,6 @@ document.querySelectorAll('.nav-item').forEach(function(item){
     item.classList.add('active');
     document.getElementById('page-'+page).classList.add('active');
     if(page==='fav')  renderFavPage();
-    if(page==='done') renderDonePage();
     if(page==='ref')  renderRefPage();
     if(page==='admin'){
       checkAdminAuth(function(){
@@ -1457,9 +1354,10 @@ document.getElementById('cacheClearBtn').addEventListener('click',function(){
 function saveFavs(){ localStorage.setItem('favs',JSON.stringify(Array.from(favSet))); }
 function saveDone(){ localStorage.setItem('done',JSON.stringify(doneMap)); }
 function updateStats(){
-  document.getElementById('doneCount').textContent  = Object.keys(doneMap).length;
-  document.getElementById('favCount').textContent   = favSet.size;
-  document.getElementById('totalCount').textContent = allWords.length;
+  var fc = document.getElementById('favCount');
+  var tc = document.getElementById('totalCount');
+  if(fc) fc.textContent = favSet.size;
+  if(tc) tc.textContent = allWords.length;
 }
 function today(){ return new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -2069,165 +1967,6 @@ function showTodaysSign() {
 // データ読み込み後に呼び出す
 // ※ allWordsが準備できた後に実行すること
 
-
-// ═══════════════════════════════════════
-//  クイズ機能
-// ═══════════════════════════════════════
-var quizState = { questions: [], current: 0, score: 0 };
-
-function renderQuizSection() {
-  var done = parseInt(document.getElementById('doneCount').textContent) || 0;
-  var fav  = parseInt(document.getElementById('favCount').textContent)  || 0;
-  var total = done + fav;
-  var section = document.getElementById('quizSection');
-  if (!section) return;
-
-  if (total < 100) {
-    // ── ロック状態 ──
-    section.innerHTML =
-      '<div class="quiz-locked">' +
-        '<span class="quiz-locked-icon">🔒</span>' +
-        '<div class="quiz-locked-prog">' + total + ' / 100</div>' +
-        '<div class="quiz-locked-msg">' +
-          '学習済み＋お気に入りが<br>' +
-          '<strong>100件</strong>になるとクイズに挑戦できます！<br>' +
-          'あと <strong>' + (100 - total) + '件</strong> で解放 🎯' +
-        '</div>' +
-      '</div>';
-  } else {
-    // ── 解放状態 ──
-    section.innerHTML =
-      '<div class="quiz-open">' +
-        '<div class="quiz-open-title">🎯 クイズに挑戦！</div>' +
-        '<div class="quiz-open-sub">お気に入り＋学習済みの単語から3問出題</div>' +
-        '<button class="quiz-start-btn" onclick="startQuiz()">▶ スタート</button>' +
-      '</div>';
-  }
-}
-
-function startQuiz() {
-  // 対象単語を集める（お気に入り＋学習済み）
-  var candidates = allWords.filter(function(w) {
-    return favorites[w._index] || doneWords[w._index];
-  });
-  if (candidates.length < 4) {
-    alert('クイズには最低4単語必要です！');
-    return;
-  }
-
-  // 3問分の問題を作成
-  quizState.questions = [];
-  quizState.current   = 0;
-  quizState.score     = 0;
-
-  var shuffled = candidates.slice().sort(function() { return Math.random() - 0.5; });
-  var picked   = shuffled.slice(0, 3);
-
-  picked.forEach(function(correct) {
-    // 不正解の選択肢3つ（全単語からランダム）
-    var wrongs = allWords
-      .filter(function(w) { return w._index !== correct._index; })
-      .sort(function() { return Math.random() - 0.5; })
-      .slice(0, 3);
-
-    var choices = [correct].concat(wrongs)
-      .sort(function() { return Math.random() - 0.5; });
-
-    quizState.questions.push({ correct: correct, choices: choices });
-  });
-
-  renderQuizQuestion();
-}
-
-function renderQuizQuestion() {
-  var section = document.getElementById('quizSection');
-  var q       = quizState.questions[quizState.current];
-  var num     = quizState.current + 1;
-  var total   = quizState.questions.length;
-
-  // YouTube サムネイル取得
-  var urls     = q.correct.urls || {};
-  var firstSrc = Object.keys(urls)[0];
-  var videoUrl = firstSrc ? urls[firstSrc] : '';
-  var videoId  = '';
-  var m = videoUrl.match(/[?&]v=([^&]+)/);
-  if (m) videoId = m[1];
-  var thumbUrl = videoId
-    ? 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg'
-    : '';
-
-  var choicesHtml = q.choices.map(function(c, i) {
-    return '<button class="quiz-choice" onclick="answerQuiz(' + i + ')">' +
-      esc(c.word) + '</button>';
-  }).join('');
-
-  section.innerHTML =
-    '<div class="quiz-container">' +
-      '<div class="quiz-progress">第' + num + '問 / 全' + total + '問</div>' +
-      '<div class="quiz-thumbnail-wrap">' +
-        (thumbUrl
-          ? '<img class="quiz-thumbnail" src="' + thumbUrl + '" alt="手話動画サムネイル">'
-          : '<div style="width:100%;height:120px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:13px;">動画なし</div>') +
-        (videoUrl ? '<span class="quiz-watch-btn" onclick="window.open(\'' + videoUrl + '\',\'_blank\')">▶ 動画を確認する</span>' : '') +
-      '</div>' +
-      '<div class="quiz-choices">' + choicesHtml + '</div>' +
-    '</div>';
-}
-
-function answerQuiz(index) {
-  var q       = quizState.questions[quizState.current];
-  var chosen  = q.choices[index];
-  var correct = q.correct;
-  var isRight = chosen._index === correct._index;
-  if (isRight) quizState.score++;
-
-  // 正解・不正解を色で表示
-  var buttons = document.querySelectorAll('.quiz-choice');
-  buttons.forEach(function(btn, i) {
-    btn.disabled = true;
-    if (q.choices[i]._index === correct._index) {
-      btn.classList.add('correct');
-    } else if (i === index && !isRight) {
-      btn.classList.add('wrong');
-    }
-  });
-
-  // 結果メッセージ＋次へボタン
-  var container = document.querySelector('.quiz-container');
-  var msg = isRight ? '⭕️ 正解！' : '❌ 不正解… 正解は「' + esc(correct.word) + '」';
-  var nextLabel = quizState.current + 1 < quizState.questions.length
-    ? '次の問題 →'
-    : '結果を見る 🎉';
-
-  container.innerHTML += 
-    '<div class="quiz-result-msg">' + msg + '</div>' +
-    '<button class="quiz-next-btn" onclick="nextQuiz()">' + nextLabel + '</button>';
-}
-
-function nextQuiz() {
-  quizState.current++;
-  if (quizState.current < quizState.questions.length) {
-    renderQuizQuestion();
-  } else {
-    showQuizScore();
-  }
-}
-
-function showQuizScore() {
-  var section = document.getElementById('quizSection');
-  var score   = quizState.score;
-  var total   = quizState.questions.length;
-  var msg     = score === total ? '🎉 全問正解！すごい！'
-              : score >= 2     ? '👍 惜しい！もう少し！'
-              : '💪 もう一度チャレンジしよう！';
-
-  section.innerHTML =
-    '<div class="quiz-score">' +
-      '<div class="quiz-score-num">' + score + ' / ' + total + '</div>' +
-      '<div class="quiz-score-msg">' + msg + '</div>' +
-      '<button class="quiz-retry-btn" onclick="startQuiz()">もう一度！</button>' +
-    '</div>';
-}
 
 // ─ 起動 ─
 init();
