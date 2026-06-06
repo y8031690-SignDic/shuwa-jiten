@@ -1282,7 +1282,6 @@ document.getElementById('sheetFavBtn').addEventListener('click',function(){
   favSet.has(word)?favSet.delete(word):favSet.add(word);
   saveFavs(); updateSheetBtns(word); updateStats();
   showToast(favSet.has(word)?'📖 マイ単語帳に追加しました':'マイ単語帳から削除しました');
-  gasCall('logFavorite',[{word:word,reading:currentSheet.reading,category:currentSheet.category,action:adding?'add':'remove'}],function(){},function(){});
   document.querySelectorAll('.row-fav[data-word="'+esc(word)+'"]').forEach(function(btn){
     btn.classList.toggle('active',favSet.has(word));
     btn.textContent=favSet.has(word)?'⭐':'☆';
@@ -2006,10 +2005,7 @@ function buildActionStatsHTML(data) {
       '<div class="stats-col-title">👆 単語タップランキング</div>' +
       makeRows(data.wordTap, 'word', 'count') +
     '</div>' +
-    '<div class="stats-section" style="margin-top:14px">' +
-      '<div class="stats-col-title">⭐ お気に入りランキング</div>' +
-      makeRows(data.favorite, 'word', 'count') +
-    '</div>' +
+
     '<div class="stats-section" style="margin-top:14px">' +
       '<div class="stats-col-title">🔎 NewSigns誘導クリック</div>' +
       makeRows(data.newSigns, 'word', 'count') +
