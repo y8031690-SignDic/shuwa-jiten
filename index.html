@@ -959,17 +959,40 @@ function init() {
   var cachedCats = Cache.get(CAT_CACHE_KEY);
   if(cachedCats){ categoryList=cachedCats; buildCategorySelects(); }
 
-  // 単語一覧（キャッシュ優先）
+  // ─────────────────────────────────────────────────
+  //  SWR（Stale-While-Revalidate）方式
+  //  ① キャッシュがあれば即座に表示（速さを維持）
+  //  ② 同時に裏でSupabaseから最新データを取得
+  //  ③ 取得完了後にデータを差し替え（常に最新）
+  // ─────────────────────────────────────────────────
   var cached = Cache.get(CACHE_KEY);
-  if(cached){ showCacheBar(true); onWordsLoaded(cached); }
-  else{
+
+  if(cached){
+    // ① キャッシュで即座に表示
+    showCacheBar(true);
+    onWordsLoaded(cached);
+
+    // ② 裏でSupabaseから最新データを取得して差し替え
+    fetchAllFromSupabase()
+      .then(function(fresh){
+        Cache.set(CACHE_KEY, fresh);
+        onWordsLoaded(fresh);
+        document.getElementById('cacheBar').classList.remove('show');
+        document.getElementById('errorBanner').classList.remove('show');
+      })
+      .catch(function(){
+        // 失敗してもキャッシュで動いているので無視
+      });
+
+  } else {
+    // キャッシュなし：通常の初回取得
     showCacheBar(false);
-    // Supabaseから全件取得
     fetchAllFromSupabase()
       .then(function(data){
         document.getElementById('errorBanner').classList.remove('show');
         Cache.set(CACHE_KEY, data);
         onWordsLoaded(data);
+        document.getElementById('cacheBar').classList.remove('show');
       })
       .catch(function(err){
         // Supabase失敗時はGitHub JSONにフォールバック
@@ -1452,7 +1475,7 @@ function showPage(page){
 function showCacheBar(fromCache){
   var bar=document.getElementById('cacheBar');
   document.getElementById('cacheMsg').textContent=fromCache
-    ?'⚡ キャッシュから読み込みました（24時間有効）'
+    ?'⚡ キャッシュから読み込み中（バックグラウンドで最新取得中）'
     :'⏳ サーバーから取得中…';
   bar.classList.add('show');
   if(fromCache)setTimeout(function(){bar.classList.remove('show');},2500);
