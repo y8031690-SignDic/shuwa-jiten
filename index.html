@@ -191,11 +191,10 @@ a { color: inherit; text-decoration: none; }
 .sheet-actions { display: flex; gap: 8px; }
 .act-btn { flex: 1; padding: 11px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; border: 1.5px solid var(--line); background: var(--white); color: var(--ink-mid); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .act-btn.fav-on  { border-color: var(--amber); color: var(--amber); background: var(--amber-light); }
-.act-btn.done-on { border-color: var(--teal);  color: var(--teal);  background: var(--teal-light);  }
 
 .sheet-note { font-size: 13px; color: var(--ink-mid); line-height: 1.7; background: var(--lime-pale); border-left: 3px solid #aed581; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-top: 14px; }
 
-/* ─ お気に入り・学習記録 ─ */
+/* ─ マイ単語帳 ─ */
 .page-title { font-size: 20px; font-weight: 900; font-family: var(--font-display); margin: 14px 0; color: var(--forest); }
 .empty-state { text-align: center; padding: 48px 16px; color: var(--ink-muted); font-size: 14px; line-height: 1.9; }
 .empty-icon  { font-size: 44px; display: block; margin-bottom: 12px; }
@@ -203,11 +202,6 @@ a { color: inherit; text-decoration: none; }
 .stat-card { flex: 1; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px; text-align: center; box-shadow: var(--shadow); }
 .stat-num  { font-size: 30px; font-weight: 900; color: var(--forest); font-family: var(--font-mono); line-height: 1; }
 .stat-label{ font-size: 11px; color: var(--ink-muted); margin-top: 4px; font-weight: 500; }
-.done-card { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; box-shadow: var(--shadow); }
-.done-word { font-size: 15px; font-weight: 700; font-family: var(--font-display); }
-.done-date { font-size: 11px; color: var(--ink-muted); font-family: var(--font-mono); margin-top: 2px; }
-.done-undo { font-size: 12px; color: var(--ink-muted); padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; font-weight: 500; transition: border-color 0.15s, color 0.15s; }
-.done-undo:hover { border-color: var(--red); color: var(--red); }
 
 /* ─ 管理者 ─ */
 .admin-card { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
@@ -400,59 +394,6 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .today-sign-word     { font-size: 19px; font-weight: 700; color: var(--forest, #2e7d32); }
 .today-sign-reading  { font-size: 12px; font-weight: 400; color: #666; }
 
-/* ── クイズコーナー ── */
-.quiz-locked {
-  text-align: center;
-  padding: 24px 16px;
-  background: var(--white);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  color: var(--ink-muted);
-}
-.quiz-locked-icon { font-size: 36px; display: block; margin-bottom: 8px; }
-.quiz-locked-msg  { font-size: 13px; line-height: 1.8; }
-.quiz-locked-prog { font-size: 22px; font-weight: 900; color: var(--forest); font-family: var(--font-mono); margin: 8px 0; }
-.quiz-open {
-  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
-  border: 1.5px solid var(--leaf, #81c784);
-  border-radius: var(--radius);
-  padding: 20px 16px;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-.quiz-open-title { font-size: 16px; font-weight: 900; color: var(--forest); margin-bottom: 6px; }
-.quiz-open-sub   { font-size: 12px; color: #666; margin-bottom: 14px; }
-.quiz-start-btn  {
-  background: var(--forest, #2e7d32);
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 12px 32px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
-}
-.quiz-start-btn:hover { background: var(--ink); transform: translateY(-1px); }
-
-/* ── クイズ出題画面 ── */
-.quiz-container { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); }
-.quiz-progress  { font-size: 12px; color: var(--ink-muted); margin-bottom: 12px; text-align: center; }
-.quiz-thumbnail { width: 100%; max-width: 320px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto 16px; cursor: pointer; }
-.quiz-thumbnail-wrap { text-align: center; margin-bottom: 4px; }
-.quiz-watch-btn { font-size: 11px; color: var(--teal); text-decoration: underline; cursor: pointer; margin-bottom: 16px; display: inline-block; }
-.quiz-choices   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-.quiz-choice    { background: var(--white); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center; }
-.quiz-choice:hover   { border-color: var(--forest); }
-.quiz-choice.correct { background: #e8f5e9; border-color: var(--forest); color: var(--forest); }
-.quiz-choice.wrong   { background: #ffebee; border-color: #e53935; color: #e53935; }
-.quiz-result-msg { text-align: center; font-size: 15px; font-weight: 700; margin: 8px 0; }
-.quiz-next-btn  { width: 100%; background: var(--forest); color: #fff; border: none; border-radius: 50px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-.quiz-score     { text-align: center; padding: 24px 16px; }
-.quiz-score-num { font-size: 48px; font-weight: 900; color: var(--forest); font-family: var(--font-mono); }
-.quiz-score-msg { font-size: 14px; color: var(--ink-muted); margin-top: 8px; }
-.quiz-retry-btn { margin-top: 16px; background: var(--forest); color: #fff; border: none; border-radius: 50px; padding: 12px 32px; font-size: 14px; font-weight: 700; cursor: pointer; }
 
 </style>
 </head>
@@ -761,7 +702,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     HTML: ミニシート（動画リンク・お気に入り・学習済み）
+     HTML: ミニシート（動画リンク・お気に入り・マイ単語帳）
      ═══════════════════════════════════════════════════════════════ -->
 <div class="overlay" id="overlay">
   <div class="sheet">
@@ -900,8 +841,8 @@ var SOURCE_EXT = {
 // ═══════════════════════════════════════════════════════════════
 //  JS: キャッシュ管理（24時間）
 // ═══════════════════════════════════════════════════════════════
-var CACHE_KEY     = 'shuwa-v9-words';
-var CAT_CACHE_KEY = 'shuwa-v9-cats';
+var CACHE_KEY     = 'shuwa-v10-words';
+var CAT_CACHE_KEY = 'shuwa-v10-cats';
 var CACHE_TTL     = 24 * 60 * 60 * 1000;
 var Cache = {
   set: function(k,d){ try{ localStorage.setItem(k,JSON.stringify({d:d,e:Date.now()+CACHE_TTL})); }catch(e){} },
@@ -922,7 +863,6 @@ var allWords     = [];
 var flatRows     = [];   // フィルタ後のフラット行（word×source）
 var categoryList = [];
 var favSet       = new Set(JSON.parse(localStorage.getItem('favs')||'[]'));
-var doneMap      = JSON.parse(localStorage.getItem('done')||'{}');
 var currentSheet = null; // ミニシートで開いている行データ
 var currentQuery = '';
 var currentPage  = 1;
@@ -1051,17 +991,19 @@ function onWordsLoaded(data) {
 // カテゴリ一覧を単語データから自動生成
 if(categoryList.length === 0){
   var GROUP_MAP = {
-    '挨拶・日常表現':'🗣️ 言語', '依頼・確認・応答':'🗣️ 言語',
-    '気持ち・感情':'🗣️ 言語', '副詞・機能語':'🗣️ 言語', '指文字・数字手話':'🗣️ 言語',
+    '挨拶・会話表現':'🗣️ 言語',                              // ★ 名称変更（日常表現→会話表現）
+    '気持ち・感情':'🗣️ 言語', '言語・コミュニケーション':'🗣️ 言語', // ★ 追加
+    '副詞・機能語':'🗣️ 言語', '指文字':'🗣️ 言語',
     '家族・親族':'👥 人・関係', '人間関係・社会生活':'👥 人・関係',
     '人の様子・性格':'👥 人・関係', '人名・サインネーム':'👥 人・関係',
     '身体・健康':'🏥 健康・医療', '医療・治療':'🏥 健康・医療',
-    '福祉・支援制度':'🏥 健康・医療', 'ろう・難聴・手話文化':'🏥 健康・医療',
+    '福祉・支援制度':'🏥 健康・医療',                         // ★ ろう・難聴・手話文化 を削除（福祉・支援制度に統合）
     '食べ物・飲み物・料理':'🏠 日常生活', '衣服・ファッション':'🏠 日常生活',
     '住まい・家具・家電':'🏠 日常生活', '買い物・お金・家計':'🏠 日常生活',
-    '学校・教育・学習':'🏫 学び・仕事', '仕事・職業・職場':'🏫 学び・仕事', 'IT・デジタル':'🏫 学び・仕事',
+    '学校・教育・学習':'🏫 学び・仕事', '仕事・職業・職場':'🏫 学び・仕事',
+    'IT・デジタル':'🏫 学び・仕事', '科学・技術':'🏫 学び・仕事', // ★ 科学・技術 追加
     '法律・政治・行政':'⚖️ 社会', '人権・多様性・共生':'⚖️ 社会',
-    '社会問題・事件・犯罪':'⚖️ 社会', '時事・新語・専門用語':'⚖️ 社会',
+    '社会問題・事件・犯罪':'⚖️ 社会',                        // ★ 時事・新語・専門用語 を削除
     '地名・国名・地域':'🌍 自然・世界', '気象・自然災害・防災':'🌍 自然・世界',
     '自然・地形・環境':'🌍 自然・世界', '動物・植物':'🌍 自然・世界',
     'スポーツ・運動':'🎉 文化・活動', '趣味・芸術・創作':'🎉 文化・活動',
@@ -1070,8 +1012,10 @@ if(categoryList.length === 0){
     '数字・量・単位':'🔢 基礎語彙', '時間・時刻・曜日':'🔢 基礎語彙',
     '日付・月・年・季節':'🔢 基礎語彙', '色・形・大きさ':'🔢 基礎語彙',
     '動作・行動を表す語':'🔢 基礎語彙', '状態・形容を表す語':'🔢 基礎語彙',
+    '位置・方向':'🔢 基礎語彙', '概念・抽象語':'🔢 基礎語彙', // ★ 追加
     '歴史・時代・古語':'📚 歴史', 'その他':'❓ その他'
   };
+
   var catSet = {};
   allWords.forEach(function(w){
     if(w.category && !catSet[w.category]) catSet[w.category] = true;
@@ -1343,27 +1287,7 @@ function renderFavPage() {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  JS: 学習記録ページ
-// ═══════════════════════════════════════════════════════════════
-function renderDonePage() {
-  updateStats();
-  var entries=Object.entries(doneMap).sort(function(a,b){return b[1].localeCompare(a[1]);});
-  var el=document.getElementById('doneList');
-  if(!entries.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📊</span>学習済みの単語がありません</div>';
-  renderQuizSection();
-  return;
-}
-  el.innerHTML=entries.map(function(e){
-    return '<div class="done-card">'+
-      '<div><div class="done-word">'+esc(e[0])+'</div><div class="done-date">'+e[1]+'</div></div>'+
-      '<button class="done-undo" data-word="'+esc(e[0])+'">解除</button></div>';
-  }).join('');
-  el.querySelectorAll('.done-undo').forEach(function(btn){
-    btn.addEventListener('click',function(){delete doneMap[btn.dataset.word];saveDone();renderDonePage();updateStats();});
-  });
- renderQuizSection();
-}
+
 
 // ═══════════════════════════════════════════════════════════════
 //  JS: 管理者ページ
@@ -1489,7 +1413,6 @@ document.getElementById('cacheClearBtn').addEventListener('click',function(){
 //  JS: ユーティリティ
 // ═══════════════════════════════════════════════════════════════
 function saveFavs(){ localStorage.setItem('favs',JSON.stringify(Array.from(favSet))); }
-function saveDone(){ localStorage.setItem('done',JSON.stringify(doneMap)); }
 function updateStats(){
   var fc=document.getElementById('favCount');
   var tc=document.getElementById('totalCount');
@@ -2048,7 +1971,7 @@ function showTodaysSign() {
   if (!allWords || allWords.length === 0) return;
 
   // 除外カテゴリ（指文字・数字・歴史は今日の手話に不向き）
-  var EXCLUDE_CATS = ['指文字・数字手話', '歴史・時代・古語'];
+  var EXCLUDE_CATS = ['指文字', '数字・量・単位', '歴史・時代・古語'];
   var candidates = allWords.filter(function(w) {
     return EXCLUDE_CATS.indexOf(w.category) === -1;
   });
@@ -2116,49 +2039,50 @@ initKanaGrid();
   var CB_IDX = 0;
   var CB_ADDED = 0;
 
-  var CATEGORIES = [
-    {cat:'挨拶・日常表現',    group:'🗣️ 言語',     cefr:'A1'},
-    {cat:'依頼・確認・応答',  group:'🗣️ 言語',     cefr:'A2'},
-    {cat:'気持ち・感情',      group:'🗣️ 言語',     cefr:'B1'},
-    {cat:'副詞・機能語',      group:'🗣️ 言語',     cefr:'B1'},
-    {cat:'指文字・数字手話',  group:'🗣️ 言語',     cefr:'A1'},
-    {cat:'家族・親族',        group:'👥 人・関係',  cefr:'A2'},
-    {cat:'人間関係・社会生活',group:'👥 人・関係',  cefr:'B1'},
-    {cat:'人の様子・性格',    group:'👥 人・関係',  cefr:'B1'},
-    {cat:'人名・サインネーム',group:'👥 人・関係',  cefr:'B2'},
-    {cat:'身体・健康',        group:'🏥 健康・医療', cefr:'A1'},
-    {cat:'医療・治療',        group:'🏥 健康・医療', cefr:'B2'},
-    {cat:'福祉・支援制度',    group:'🏥 健康・医療', cefr:'B2'},
-    {cat:'ろう・難聴・手話文化',group:'🏥 健康・医療',cefr:'B2'},
-    {cat:'食べ物・飲み物・料理',group:'🏠 日常生活', cefr:'A2'},
-    {cat:'衣服・ファッション', group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'住まい・家具・家電', group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'買い物・お金・家計', group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'学校・教育・学習',  group:'🏫 学び・仕事', cefr:'B1'},
-    {cat:'仕事・職業・職場',  group:'🏫 学び・仕事', cefr:'B1'},
-    {cat:'IT・デジタル',      group:'🏫 学び・仕事', cefr:'B2'},
-    {cat:'法律・政治・行政',  group:'⚖️ 社会',      cefr:'B2'},
-    {cat:'人権・多様性・共生', group:'⚖️ 社会',     cefr:'C1'},
-    {cat:'社会問題・事件・犯罪',group:'⚖️ 社会',    cefr:'B2'},
-    {cat:'時事・新語・専門用語',group:'⚖️ 社会',    cefr:'B2'},
-    {cat:'地名・国名・地域',  group:'🌍 自然・世界', cefr:'B2'},
-    {cat:'気象・自然災害・防災',group:'🌍 自然・世界',cefr:'B1'},
-    {cat:'自然・地形・環境',  group:'🌍 自然・世界', cefr:'B1'},
-    {cat:'動物・植物',        group:'🌍 自然・世界', cefr:'A2'},
-    {cat:'スポーツ・運動',    group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'趣味・芸術・創作',  group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'遊び・ゲーム・娯楽',group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'行事・冠婚葬祭',    group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'乗り物・交通',      group:'🚃 場所・移動', cefr:'A2'},
-    {cat:'場所・施設・建物',  group:'🚃 場所・移動', cefr:'A2'},
-    {cat:'数字・量・単位',    group:'🔢 基礎語彙',  cefr:'A1'},
-    {cat:'時間・時刻・曜日',  group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'日付・月・年・季節',group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'色・形・大きさ',    group:'🔢 基礎語彙',  cefr:'A1'},
-    {cat:'動作・行動を表す語',group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'状態・形容を表す語',group:'🔢 基礎語彙',  cefr:'B1'},
-    {cat:'歴史・時代・古語',  group:'📚 歴史',      cefr:'C1'},
-    {cat:'その他',            group:'❓ その他',    cefr:'A2'},
+var CATEGORIES = [
+    {cat:'挨拶・会話表現',        group:'🗣️ 言語',     cefr:'A1'},
+    {cat:'気持ち・感情',          group:'🗣️ 言語',     cefr:'B1'},
+    {cat:'言語・コミュニケーション',group:'🗣️ 言語',   cefr:'A2'},
+    {cat:'副詞・機能語',          group:'🗣️ 言語',     cefr:'B1'},
+    {cat:'指文字',      group:'🗣️ 言語',     cefr:'A1'},
+    {cat:'家族・親族',            group:'👥 人・関係',  cefr:'A2'},
+    {cat:'人間関係・社会生活',    group:'👥 人・関係',  cefr:'B1'},
+    {cat:'人の様子・性格',        group:'👥 人・関係',  cefr:'B1'},
+    {cat:'人名・サインネーム',    group:'👥 人・関係',  cefr:'B2'},
+    {cat:'身体・健康',            group:'🏥 健康・医療', cefr:'A1'},
+    {cat:'医療・治療',            group:'🏥 健康・医療', cefr:'B2'},
+    {cat:'福祉・支援制度',        group:'🏥 健康・医療', cefr:'B2'},
+    {cat:'食べ物・飲み物・料理',  group:'🏠 日常生活',  cefr:'A2'},
+    {cat:'衣服・ファッション',    group:'🏠 日常生活',  cefr:'A2'},
+    {cat:'住まい・家具・家電',    group:'🏠 日常生活',  cefr:'A2'},
+    {cat:'買い物・お金・家計',    group:'🏠 日常生活',  cefr:'A2'},
+    {cat:'学校・教育・学習',      group:'🏫 学び・仕事', cefr:'B1'},
+    {cat:'仕事・職業・職場',      group:'🏫 学び・仕事', cefr:'B1'},
+    {cat:'IT・デジタル',          group:'🏫 学び・仕事', cefr:'B2'},
+    {cat:'科学・技術',            group:'🏫 学び・仕事', cefr:'B2'},
+    {cat:'法律・政治・行政',      group:'⚖️ 社会',      cefr:'B2'},
+    {cat:'人権・多様性・共生',    group:'⚖️ 社会',      cefr:'C1'},
+    {cat:'社会問題・事件・犯罪',  group:'⚖️ 社会',      cefr:'B2'},
+    {cat:'地名・国名・地域',      group:'🌍 自然・世界', cefr:'B2'},
+    {cat:'気象・自然災害・防災',  group:'🌍 自然・世界', cefr:'B1'},
+    {cat:'自然・地形・環境',      group:'🌍 自然・世界', cefr:'B1'},
+    {cat:'動物・植物',            group:'🌍 自然・世界', cefr:'A2'},
+    {cat:'スポーツ・運動',        group:'🎉 文化・活動', cefr:'B1'},
+    {cat:'趣味・芸術・創作',      group:'🎉 文化・活動', cefr:'B1'},
+    {cat:'遊び・ゲーム・娯楽',    group:'🎉 文化・活動', cefr:'B1'},
+    {cat:'行事・冠婚葬祭',        group:'🎉 文化・活動', cefr:'B1'},
+    {cat:'乗り物・交通',          group:'🚃 場所・移動', cefr:'A2'},
+    {cat:'場所・施設・建物',      group:'🚃 場所・移動', cefr:'A2'},
+    {cat:'数字・量・単位',        group:'🔢 基礎語彙',  cefr:'A1'},
+    {cat:'時間・時刻・曜日',      group:'🔢 基礎語彙',  cefr:'A2'},
+    {cat:'日付・月・年・季節',    group:'🔢 基礎語彙',  cefr:'A2'},
+    {cat:'色・形・大きさ',        group:'🔢 基礎語彙',  cefr:'A1'},
+    {cat:'動作・行動を表す語',    group:'🔢 基礎語彙',  cefr:'A2'},
+    {cat:'状態・形容を表す語',    group:'🔢 基礎語彙',  cefr:'B1'},
+    {cat:'位置・方向',            group:'🔢 基礎語彙',  cefr:'A1'},
+    {cat:'概念・抽象語',          group:'🔢 基礎語彙',  cefr:'B2'},
+    {cat:'歴史・時代・古語',      group:'📚 歴史',      cefr:'C1'},
+    {cat:'その他',                group:'❓ その他',    cefr:'A2'},
   ];
   var CAT_NAMES = CATEGORIES.map(function(c){ return c.cat; });
 
