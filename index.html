@@ -773,11 +773,18 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 var GAS_URL        = 'https://script.google.com/macros/s/AKfycbxN6HfQWVBjT98Z01aYuss0Rw5Eut79zp6P0jn_JY1hG_nOP_5H02SF4rOB7V0V-UhPTQ/exec';
 var WORDS_JSON_URL = 'https://y8031690-SignDic.github.io/shuwa-jiten/words.json'; // フォールバック用
 var SUPABASE_URL   = 'https://wlmuwosuzhgcwepjskdv.supabase.co';
-var SUPABASE_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsbXV3b3N1emhnY3dlcGpza2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODAzNTIsImV4cCI6MjA5NjA1NjM1Mn0._Vtpg2cZhVKk5FrG92qyt7EUoIeToog7cAgxnsm9JS0';
+var SUPABASE_KEY   = 'sb_publishable_Olx5EejNM3govw75kJE2qQ_pcOA2rC1';
 
 // ★ 管理者パスワード（変更してください）
+// 注意: これはHTMLソースに平文で残るため「画面を隠すだけ」のUIゲートです。
+//       本当のアクセス制御は ADMIN_TOKEN をGAS側(doPost)で検証することで行ってください。
 var ADMIN_PASSWORD = 'signdic2026';
 var adminAuthed    = false;  // セッション中の認証状態（リロードでリセット）
+
+// ★ 管理者用トークン（GAS側の管理操作で共通利用。長くランダムな文字列に変更してください）
+//   getUncategorized / addCategoryKeywords / reclassifyAll / classifyWords すべてに付与し、
+//   GAS側のdoPostで一致しなければ拒否するようにしてください（下部の説明参照）。
+var ADMIN_TOKEN = 'SHUWA2026';
 
 function checkAdminAuth(onSuccess) {
   if (adminAuthed) { onSuccess(); return; }
@@ -2110,7 +2117,7 @@ var CATEGORIES = [
   }
 
   async function cbFetchUncategorized() {
-    var url = GAS_URL + '?token=SHUWA2026&action=getUncategorized';
+    var url = GAS_URL + '?token=' + encodeURIComponent(ADMIN_TOKEN) + '&action=getUncategorized';
     var res  = await fetch(url);
     var data = await res.json();
     if (data.status !== 'ok') throw new Error(data.message || '取得失敗');
@@ -2119,17 +2126,16 @@ var CATEGORIES = [
 
   async function cbClassify(words) {
     var prompt = '以下の日本語単語を、指定カテゴリのいずれか1つに分類してください。\nJSON配列のみ返してください。説明不要。\n\nカテゴリ:\n' + CAT_NAMES.join('、') + '\n\n単語:\n' + words.map(function(w,i){ return i+': '+w; }).join('\n') + '\n\n回答例: ["カテゴリA","その他","カテゴリB"]';
-    var res  = await fetch('https://api.anthropic.com/v1/messages', {
+    // ※ Anthropic APIキーはブラウザに置かず、GAS側(Script Properties)で保管・利用する。
+    //   ここではGASに 'classifyWords' アクションとしてプロンプトを渡すだけ。
+    var res  = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      body: JSON.stringify({ action: 'classifyWords', args: [prompt], token: ADMIN_TOKEN })
     });
     var data = await res.json();
-    var text = ((data.content && data.content[0] && data.content[0].text) || '[]').replace(/```json|```/g,'').trim();
+    if (data.error) { cbLog('  ⚠️ classifyWords エラー: ' + data.error); return words.map(function(){ return 'その他'; }); }
+    var text = (data.result || '[]').replace(/```json|```/g,'').trim();
     try {
       var arr = JSON.parse(text);
       if (Array.isArray(arr) && arr.length === words.length) return arr;
@@ -2141,7 +2147,7 @@ var CATEGORIES = [
     var res  = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'addCategoryKeywords', args: [entries] })
+      body: JSON.stringify({ action: 'addCategoryKeywords', args: [entries], token: ADMIN_TOKEN })
     });
     var data = await res.json();
     return (data.result && data.result.added) || 0;
@@ -2221,7 +2227,7 @@ var CATEGORIES = [
       var res  = await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reclassifyAll', args: [] })
+        body: JSON.stringify({ action: 'reclassifyAll', args: [], token: ADMIN_TOKEN })
       });
       var data = await res.json();
       cbLog(data.result ? '✅ reclassifyAll 完了！' : '⚠️ 応答: ' + JSON.stringify(data));
