@@ -1063,6 +1063,8 @@ function applyFilter() {
   }
 
   var filtered = allWords.filter(function(w){
+    if (w.section === '例文' || w.section === '語源の話') return false;
+    if (w.word.includes('【例文】') || w.word.includes('【語源】')) return false;
     return w.word.includes(q) ||
            hiraToKata(w.reading).includes(qKata); // よみはカタカナ統一で比較
   });
@@ -1547,6 +1549,8 @@ function renderKanaResults(kana, type) {
   var kata = kana ? (KANA_MAP[kana]||hiraToKata(kana)) : null;
 
   var results = allWords.filter(function(w) {
+    if (w.section === '例文' || w.section === '語源の話') return false;
+    if (w.word.includes('【例文】') || w.word.includes('【語源】')) return false;
     if(!w.reading && !w.word) return false;
     var firstRead = hiraToKata(w.reading||w.word)[0]||'';
     var firstWord = (w.word||'')[0]||'';
@@ -1731,7 +1735,11 @@ function buildCatItemButtons(categories) {
 }
 
 function renderCatResults(category) {
-  var words = allWords.filter(function(w) { return w.category === category; });
+  var words = allWords.filter(function(w) {
+    if (w.section === '例文' || w.section === '語源の話') return false;
+    if (w.word.includes('【例文】') || w.word.includes('【語源】')) return false;
+    return w.category === category;
+  });
   words.sort(function(a, b) {
     return hiraToKata(a.reading || a.word).localeCompare(hiraToKata(b.reading || b.word), 'ja');
   });
