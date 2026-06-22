@@ -183,6 +183,12 @@ a { color: inherit; text-decoration: none; }
 .sheet-link-btn:hover { background: var(--white); transform: translateY(-1px); box-shadow: var(--shadow); }
 .sheet-link-btn.ext { background: var(--amber-light); border-color: var(--amber); color: #7a5000; }
 .sheet-link-btn.ext:hover { background: var(--white); }
+.sheet-link-btn.extra-reibun { background: var(--teal-light); border-color: var(--teal); color: #004d40; }
+.sheet-link-btn.extra-reibun:hover { background: var(--white); transform: translateY(-1px); box-shadow: var(--shadow); }
+.sheet-link-btn.extra-reibun .sheet-link-arrow { color: var(--teal); }
+.sheet-link-btn.extra-gogen  { background: #fce4ec; border-color: #c2185b; color: #880e4f; }
+.sheet-link-btn.extra-gogen:hover  { background: var(--white); transform: translateY(-1px); box-shadow: var(--shadow); }
+.sheet-link-btn.extra-gogen  .sheet-link-arrow { color: #c2185b; }
 .sheet-link-icon  { font-size: 18px; }
 .sheet-link-label { flex: 1; }
 .sheet-link-arrow { font-size: 16px; color: var(--lime); }
@@ -720,6 +726,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
       <span class="sheet-link-label" id="sheetLinkLabel"></span>
       <span class="sheet-link-arrow">→</span>
     </a>
+    <div id="sheetExtraLinks" style="display:none"></div>
     <div class="sheet-actions">
       <button class="act-btn" id="sheetFavBtn">📖 マイ単語帳に追加</button>
     </div>
@@ -991,6 +998,7 @@ function onWordsLoaded(data) {
       note:     String(row.note     || row['note（補足）']              || ''),
       cefr:     String(row.cefr     || row['cefr（レベル）']            || ''),
       category: String(row.category || row['category（カテゴリ）']      || ''),
+      section:  String(row.section  || row['section（編）'] || ''),
       urls:     typeof urls==='object' ? urls : {}
     };
   });
@@ -1228,6 +1236,35 @@ function openSheet(row) {
   var noteEl = document.getElementById('sheetNote');
   if(row.note){noteEl.textContent=row.note;noteEl.style.display='block';}
   else{noteEl.style.display='none';}
+
+  // 例文・語源の話ボタン
+  var extraEl = document.getElementById('sheetExtraLinks');
+  var related = allWords.filter(function(w) {
+    return w.word === row.word &&
+           (w.section === '例文' || w.section === '語源の話');
+  });
+  if (related.length > 0) {
+    var extraHtml = related.map(function(w) {
+      var urls     = w.urls || {};
+      var firstSrc = Object.keys(urls)[0];
+      var url      = firstSrc ? urls[firstSrc] : '';
+      if (!url) return '';
+      var isReibun = w.section === '例文';
+      var icon  = isReibun ? '📽' : '🌱';
+      var label = isReibun ? '例文を見る' : '語源の話を見る';
+      var cls   = isReibun ? 'extra-reibun' : 'extra-gogen';
+      return '<a class="sheet-link-btn ' + cls + '" href="' + esc(url) + '" target="_blank" rel="noopener">' +
+        '<span class="sheet-link-icon">' + icon + '</span>' +
+        '<span class="sheet-link-label">' + label + '</span>' +
+        '<span class="sheet-link-arrow">→</span>' +
+        '</a>';
+    }).join('');
+    extraEl.innerHTML = extraHtml;
+    extraEl.style.display = 'block';
+  } else {
+    extraEl.innerHTML = '';
+    extraEl.style.display = 'none';
+  }
 
   updateSheetBtns(row.word);
   document.getElementById('overlay').classList.add('open');
@@ -1978,9 +2015,11 @@ function showTodaysSign() {
   if (!allWords || allWords.length === 0) return;
 
   // 除外カテゴリ（指文字・数字・歴史は今日の手話に不向き）
-  var EXCLUDE_CATS = ['指文字', '数字・量・単位', '歴史・時代・古語'];
+  var EXCLUDE_CATS     = ['指文字', '数字・量・単位', '歴史・時代・古語'];
+  var EXCLUDE_SECTIONS = ['例文', '語源の話'];
   var candidates = allWords.filter(function(w) {
-    return EXCLUDE_CATS.indexOf(w.category) === -1;
+    return EXCLUDE_CATS.indexOf(w.category) === -1 &&
+           EXCLUDE_SECTIONS.indexOf(w.section) === -1;
   });
   if (!candidates.length) candidates = allWords;
 
