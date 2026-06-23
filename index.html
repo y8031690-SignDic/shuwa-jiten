@@ -552,7 +552,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
   <!-- カテゴリ辞書育成ツール -->
   <div class="admin-card" id="categoryBuilderCard">
     <div class="admin-title">🤖 カテゴリ辞書育成（AI自動分類）</div>
-    <p style="font-size:12px;color:var(--ink-muted);margin-bottom:12px;line-height:1.7;">「その他」単語をClaudeで分類し、カテゴリ辞書に追記します。<br>完了後は reclassifyAll を実行してください。</p>
+    <p style="font-size:12px;color:var(--ink-muted);margin-bottom:12px;line-height:1.7;">「その他」単語をClaudeで分類し、カテゴリ辞書に追記します。<br>完了後は reclassifyUncategorizedOnly を実行してください。</p>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
       <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center;">
@@ -580,7 +580,7 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     <div style="display:flex;gap:8px;">
       <button class="submit-btn" id="cb-btn-start" onclick="cbStart()" style="flex:1;">▶ 開始</button>
       <button class="submit-btn" id="cb-btn-stop" onclick="cbStop()" disabled style="flex:1;opacity:0.4;background:var(--ink-muted);">■ 停止</button>
-      <button class="submit-btn" onclick="cbReclassify()" style="flex:1;background:var(--teal);">🔄 reclassifyAll</button>
+      <button class="submit-btn" onclick="cbReclassify()" style="flex:1;background:var(--teal);">🔄 reclassifyUncategorizedOnly</button>
     </div>
   </div>
 </div>
@@ -2256,7 +2256,7 @@ var CATEGORIES = [
 
       if (CB_IDX >= CB_WORDS.length) {
         cbLog('✅ 完了！ 辞書に合計' + CB_ADDED + '語を追記しました。');
-        cbLog('次: reclassifyAll を実行してください。');
+        cbLog('次: reclassifyUncategorizedOnly を実行してください。');
       } else {
         cbLog('⏸ 停止しました。再度「開始」で続きから再開できます。');
       }
@@ -2271,15 +2271,15 @@ var CATEGORIES = [
   window.cbStop = function() { CB_RUNNING = false; };
 
   window.cbReclassify = async function() {
-    cbLog('reclassifyAll 実行中…（時間がかかります）');
+    cbLog('reclassifyUncategorizedOnly 実行中…（時間がかかります）');
     try {
       var res  = await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'reclassifyAll', args: [], token: ADMIN_TOKEN })
+        body: JSON.stringify({ action: 'reclassifyUncategorizedOnly', args: [], token: ADMIN_TOKEN })
       });
       var data = await res.json();
-      cbLog(data.result ? '✅ reclassifyAll 完了！' : '⚠️ 応答: ' + JSON.stringify(data));
+      cbLog(data.result ? '✅ reclassifyUncategorizedOnly 完了！' : '⚠️ 応答: ' + JSON.stringify(data));
     } catch(err) {
       cbLog('❌ エラー: ' + err.message);
     }
