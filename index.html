@@ -1240,18 +1240,19 @@ function openSheet(row) {
   else{noteEl.style.display='none';}
 
   // 例文・語源の話ボタン
-  var extraEl = document.getElementById('sheetExtraLinks');
-  var related = allWords.filter(function(w) {
-    return w.word === row.word &&
-           (w.section === '例文' || w.section === '語源の話');
+var related = allWords.filter(function(w) {
+    if (w.source !== row.source) return false;
+    if (w.word === row.word && (w.section === '例文' || w.section === '語源の話')) return true;
+    if (w.word === row.word + '【例文】') return true;
+    return false;
   });
-  if (related.length > 0) {
+    if (related.length > 0) {
     var extraHtml = related.map(function(w) {
       var urls     = w.urls || {};
       var firstSrc = Object.keys(urls)[0];
       var url      = firstSrc ? urls[firstSrc] : '';
       if (!url) return '';
-      var isReibun = w.section === '例文';
+      var isReibun = w.section === '例文' || w.word.includes('【例文】');
       var icon  = isReibun ? '📽' : '🌱';
       var label = isReibun ? '例文を見る' : '語源の話を見る';
       var cls   = isReibun ? 'extra-reibun' : 'extra-gogen';
@@ -2177,7 +2178,7 @@ var CATEGORIES = [
     //   ここではGASに 'classifyWords' アクションとしてプロンプトを渡すだけ。
     var res  = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'classifyWords', args: [prompt], token: ADMIN_TOKEN })
     });
     var data = await res.json();
@@ -2193,7 +2194,7 @@ var CATEGORIES = [
   async function cbWriteDict(entries) {
     var res  = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'addCategoryKeywords', args: [entries], token: ADMIN_TOKEN })
     });
     var data = await res.json();
@@ -2273,7 +2274,7 @@ var CATEGORIES = [
     try {
       var res  = await fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'reclassifyAll', args: [], token: ADMIN_TOKEN })
       });
       var data = await res.json();
