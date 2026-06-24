@@ -1242,7 +1242,7 @@ function openSheet(row) {
   // 例文・語源の話ボタン
 var extraEl = document.getElementById('sheetExtraLinks');
 var related = allWords.filter(function(w) {
-    if (w.source !== row.source) return false;
+    if (w.source !== row.src) return false;
     if (w.word === row.word && (w.section === '例文' || w.section === '語源の話')) return true;
     if (w.word === row.word + '【例文】') return true;
     return false;
