@@ -327,6 +327,38 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 }
 .cat-placeholder-icon { font-size: 32px; }
 
+.cat-item-group-hdr {
+  font-weight: bold;
+  background: var(--lime-light);
+  border-color: var(--lime);
+}
+.cat-item-group-hdr:hover {
+  background: var(--lime-light);
+}
+.cat-group-arrow {
+  font-size: 10px;
+  margin-right: 6px;
+  color: var(--forest);
+}
+.cat-item-children {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding-left: 12px;
+  border-left: 2px solid var(--lime);
+}
+.cat-item-child {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--forest);
+  opacity: 0.85;
+}
+.cat-item-child:hover {
+  opacity: 1;
+}
+
+
 /* ─ 2段階かなナビ ─ */
 .kana-row-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
 .kana-row-btn { padding: 12px 4px; background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--forest); font-family: var(--font-display); transition: all 0.15s; }
@@ -832,7 +864,7 @@ var SOURCE_LABELS = {
   'signs-io':'Signs I/O','otokogumi':'男組',
   'sunada-atom':'砂田アトム','imai-akito':'今井彰人',
   'ezoe-satoshi':'江副悟史','shuwa-bunka-mura':'手話文化村',
-  'araki-hirohiko':'荒木宏彦','yoshiyama':'吉山さん',
+  'araki-hirohiko':'荒木宏彦','yoshiyama':'ﾔﾏﾖｼ',
   'mimisuppo':'mimisuppo','asaka-shakyo':'朝霞社協',
   'accessible-cancer':'アクセシブルながん情報',
   'deaf-highschool':'ろう難聴高校生塾','mede-kiku-tv':'目で聴くテレビ',
@@ -1649,6 +1681,19 @@ var TSUKUBA_SOURCES = [
   { src: 'tsukuba_kyoto2', label: '手話Ⅱ 京都' },
   { src: 'tsukuba_osaka',  label: '手話辞典 大阪' },
   { src: 'tsukuba_shiori', label: '手まねと言葉の栞' },
+  {
+    label: '九州の手話',
+    group: true,                          // ← アコーディオンフラグ
+    children: [
+      { src: 'tsukuba_kyushu_福岡',   label: '九州の手話－福岡' },
+      { src: 'tsukuba_kyushu_長崎',   label: '九州の手話－長崎' },
+      { src: 'tsukuba_kyushu_熊本',   label: '九州の手話－熊本' },
+      { src: 'tsukuba_kyushu_大分',   label: '九州の手話－大分' },
+      { src: 'tsukuba_kyushu_宮崎',   label: '九州の手話－宮崎' },
+      { src: 'tsukuba_kyushu_鹿児島', label: '九州の手話－鹿児島' },
+      { src: 'tsukuba_kyushu_沖縄',   label: '九州の手話－沖縄' },
+    ]
+  },
   { src: 'tsukuba_cks',    label: '聴覚管理に係る手話' },
   { src: 'tsukuba_edu',    label: '大学生活に係る手話' },
 ];
@@ -1701,9 +1746,25 @@ function initCategoryNav() {
   var tsukubaEntry = {
     group: '📜 筑波',
     _isTsukuba: true,
-    categories: TSUKUBA_SOURCES.map(function(s) {
-      return { category: s.label, _src: s.src, count: srcCount[s.src] || 0 };
-    })
+    categories: (function() {
+      var cats = [];
+      TSUKUBA_SOURCES.forEach(function(s) {
+        if (s.group) {
+          // アコーディオン親行
+          cats.push({
+            category: s.label,
+            _isGroup: true,
+            _open: false,
+            children: s.children.map(function(c) {
+              return { category: c.label, _src: c.src, count: srcCount[c.src] || 0, _isChild: true };
+            })
+          });
+        } else {
+          cats.push({ category: s.label, _src: s.src, count: srcCount[s.src] || 0 });
+        }
+      });
+      return cats;
+    })()
   };
   var otherIdx = _catGroupList.findIndex(function(g) { return g.group === '❓ その他'; });
   if (otherIdx >= 0) {
@@ -1757,24 +1818,66 @@ function buildCatGroupButtons() {
 function buildCatItemButtons(categories) {
   var wrap = document.getElementById('catItemsWrap');
   wrap.innerHTML = '';
-  categories.forEach(function(item) {
-    var btn = document.createElement('button');
-    btn.className = 'cat-item-btn';
-    btn.innerHTML = esc(item.category) +
-      '<span class="cat-count-badge">' + item.count.toLocaleString() + '</span>';
-    btn.dataset.cat = item.category;
-    btn.addEventListener('click', function() {
-      wrap.querySelectorAll('.cat-item-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      _selectedCat = item.category;
-      if (item._src) {
-        renderSourceResults(item._src, item.category);
-      } else {
-        renderCatResults(item.category);
+
+  function renderItems(list, container) {
+    list.forEach(function(item) {
+
+      // ── アコーディオン親行 ──
+      if (item._isGroup) {
+        var totalCount = item.children.reduce(function(s, c) { return s + c.count; }, 0);
+
+        // ← wrapper で hdr + childWrap をまとめる
+        var wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+
+        var hdr = document.createElement('button');
+        hdr.className = 'cat-item-btn cat-item-group-hdr';
+        hdr.innerHTML =
+          '<span class="cat-group-arrow">' + (item._open ? '▼' : '▶') + '</span>' +
+          esc(item.category) +
+          '<span class="cat-count-badge">' + totalCount.toLocaleString() + '</span>';
+
+        var childWrap = document.createElement('div');
+        childWrap.className = 'cat-item-children';
+        childWrap.style.display = item._open ? 'flex' : 'none';  // ← flex に変更
+        renderItems(item.children, childWrap);
+
+        hdr.addEventListener('click', function() {
+          item._open = !item._open;
+          childWrap.style.display = item._open ? 'flex' : 'none';  // ← flex に変更
+          hdr.querySelector('.cat-group-arrow').textContent = item._open ? '▼' : '▶';
+        });
+
+        wrapper.appendChild(hdr);
+        wrapper.appendChild(childWrap);
+        container.appendChild(wrapper);  // ← wrapper ごと追加
+        return;
       }
+
+      // ── 通常行 / 子行 ──
+      var btn = document.createElement('button');
+      btn.className = 'cat-item-btn' + (item._isChild ? ' cat-item-child' : '');
+      btn.innerHTML = esc(item.category) +
+        '<span class="cat-count-badge">' + item.count.toLocaleString() + '</span>';
+      btn.dataset.cat = item.category;
+
+      btn.addEventListener('click', function() {
+        wrap.querySelectorAll('.cat-item-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        _selectedCat = item.category;
+        if (item._src) {
+          renderSourceResults(item._src, item.category);
+        } else {
+          renderCatResults(item.category);
+        }
+      });
+
+      container.appendChild(btn);
     });
-    wrap.appendChild(btn);
-  });
+  }
+
+  renderItems(categories, wrap);
 }
 
 function renderCatResults(category) {
