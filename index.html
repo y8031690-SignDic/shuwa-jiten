@@ -1639,7 +1639,19 @@ var _selectedCat     = null;
 var CAT_GROUP_ORDER = [
   '🗣️ 言語', '👥 人・関係', '🏥 健康・医療', '🏠 日常生活',
   '🏫 学び・仕事', '⚖️ 社会', '🌍 自然・世界', '🎉 文化・活動',
-  '🚃 場所・移動', '🔢 基礎語彙', '📚 歴史', '❓ その他'
+  '🚃 場所・移動', '🔢 基礎語彙', '📚 歴史', '📜 筑波', '❓ その他'
+];
+
+var TSUKUBA_SOURCES = [
+  { src: 'tsukuba_temane', label: '手まね入門（1964）' },
+  { src: 'tsukuba_roa',    label: '聾啞教授手話法' },
+  { src: 'tsukuba_kyoto1', label: '手話Ⅰ 京都' },
+  { src: 'tsukuba_kyoto2', label: '手話Ⅱ 京都' },
+  { src: 'tsukuba_osaka',  label: '手話辞典 大阪' },
+  { src: 'tsukuba_shiori', label: '手まねと言葉の栞' },
+  { src: 'tsukuba_kyushu', label: '九州の手話' },
+  { src: 'tsukuba_cks',    label: '聴覚管理に係る手話' },
+  { src: 'tsukuba_edu',    label: '大学生活に係る手話' },
 ];
 
 function initCategoryNav() {
@@ -1677,6 +1689,29 @@ function initCategoryNav() {
       _catGroupList.push({ group: g, categories: groupMap[g] });
     }
   });
+  // 筑波サブソースの件数カウント
+  var srcCount = {};
+  allWords.forEach(function(w) {
+    var urls = w.urls || {};
+    Object.keys(urls).forEach(function(src) {
+      if (urls[src]) srcCount[src] = (srcCount[src] || 0) + 1;
+    });
+  });
+
+  // 筑波エントリを _catGroupList に注入
+  var tsukubaEntry = {
+    group: '📜 筑波',
+    _isTsukuba: true,
+    categories: TSUKUBA_SOURCES.map(function(s) {
+      return { category: s.label, _src: s.src, count: srcCount[s.src] || 0 };
+    })
+  };
+  var otherIdx = _catGroupList.findIndex(function(g) { return g.group === '❓ その他'; });
+  if (otherIdx >= 0) {
+    _catGroupList.splice(otherIdx, 0, tsukubaEntry);
+  } else {
+    _catGroupList.push(tsukubaEntry);
+  }
 
   buildCatGroupButtons();
   _catNavReady = true;
@@ -1733,7 +1768,11 @@ function buildCatItemButtons(categories) {
       wrap.querySelectorAll('.cat-item-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       _selectedCat = item.category;
-      renderCatResults(item.category);
+      if (item._src) {
+        renderSourceResults(item._src, item.category);
+      } else {
+        renderCatResults(item.category);
+      }
     });
     wrap.appendChild(btn);
   });
@@ -1751,9 +1790,126 @@ function renderCatResults(category) {
 
   var el = document.getElementById('catResults');
   if (!words.length) {
-    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>この カテゴリには単語がありません</div>';
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>このカテゴリには単語がありません</div>';
     return;
   }
+
+  var rows = [];
+  words.forEach(function(w) {
+    var urls = w.urls || {};
+    Object.keys(urls).forEach(function(src) {
+      var url = urls[src]; if (!url) return;
+      rows.push({ word: w.word, reading: w.reading, cefr: w.cefr, category: w.category, note: w.note, src: src, url: url, _wordIndex: w._index });
+    });
+  });
+
+  var html =
+    '<div class="cat-result-title">' +
+      esc(category) +
+      ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' + rows.length.toLocaleString() + '件</span>' +
+    '</div>' +
+    '<div class="result-list">' +
+    rows.map(function(row, i) {
+      var label = SOURCE_LABELS[row.src] || row.src;
+      var icon  = SOURCE_EXT[row.src] ? '🔗' : '▶';
+      var isFav = favSet.has(row.word);
+      return '<div class="result-row" data-catidx="' + i + '">' +
+        '<div class="row-word-wrap">' +
+          '<span class="row-word">' + esc(row.word) + '</span>' +
+          '<span class="row-reading">' + esc(row.reading) + '</span>' +
+        '</div>' +
+        '<div class="row-src">' +
+          '<span class="row-src-icon">' + icon + '</span>' +
+          '<span class="row-src-label">' + esc(label) + '</span>' +
+        '</div>' +
+        '<button class="row-fav ' + (isFav ? 'active' : '') + '" data-word="' + esc(row.word) + '">' + (isFav ? '⭐' : '☆') + '</button>' +
+      '</div>';
+    }).join('') +
+    '</div>';
+
+  el.innerHTML = html;
+
+  el.querySelectorAll('.result-row').forEach(function(rowEl) {
+    rowEl.addEventListener('click', function(e) {
+      if (e.target.classList.contains('row-fav')) return;
+      openSheet(rows[+rowEl.dataset.catidx]);
+    });
+  });
+  el.querySelectorAll('.row-fav').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var word = btn.dataset.word;
+      favSet.has(word) ? favSet.delete(word) : favSet.add(word);
+      saveFavs(); updateStats();
+      btn.classList.toggle('active', favSet.has(word));
+      btn.textContent = favSet.has(word) ? '⭐' : '☆';
+    });
+  });
+}
+
+function renderSourceResults(src, label) {
+  var rows = [];
+  allWords.forEach(function(w) {
+    if (w.section === '例文' || w.section === '語源の話') return;
+    if (w.word.includes('【例文】') || w.word.includes('【語源】')) return;
+    var urls = w.urls || {};
+    if (!urls[src]) return;
+    rows.push({ word: w.word, reading: w.reading, cefr: w.cefr,
+                category: w.category, note: w.note,
+                src: src, url: urls[src], _wordIndex: w._index });
+  });
+  rows.sort(function(a, b) {
+    return hiraToKata(a.reading || a.word).localeCompare(hiraToKata(b.reading || b.word), 'ja');
+  });
+
+  var el = document.getElementById('catResults');
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>このソースには単語がありません</div>';
+    return;
+  }
+
+  var html =
+    '<div class="cat-result-title">' + esc(label) +
+    ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' +
+    rows.length.toLocaleString() + '件</span></div>' +
+    '<div class="result-list">' +
+    rows.map(function(row, i) {
+      var isFav = favSet.has(row.word);
+      return '<div class="result-row" data-srcidx="' + i + '">' +
+        '<div class="row-word-wrap">' +
+          '<span class="row-word">' + esc(row.word) + '</span>' +
+          '<span class="row-reading">' + esc(row.reading) + '</span>' +
+        '</div>' +
+        '<div class="row-src">' +
+          '<span class="row-src-icon">🔗</span>' +
+          '<span class="row-src-label">' + esc(row.category || '') + '</span>' +
+        '</div>' +
+        '<button class="row-fav ' + (isFav ? 'active' : '') +
+          '" data-word="' + esc(row.word) + '">' + (isFav ? '⭐' : '☆') + '</button>' +
+      '</div>';
+    }).join('') + '</div>';
+
+  el.innerHTML = html;
+
+  el.querySelectorAll('.result-row').forEach(function(rowEl) {
+    rowEl.addEventListener('click', function(e) {
+      if (e.target.classList.contains('row-fav')) return;
+      openSheet(rows[+rowEl.dataset.srcidx]);
+    });
+  });
+  el.querySelectorAll('.row-fav').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var word = btn.dataset.word;
+      favSet.has(word) ? favSet.delete(word) : favSet.add(word);
+      saveFavs(); updateStats();
+      btn.classList.toggle('active', favSet.has(word));
+      btn.textContent = favSet.has(word) ? '⭐' : '☆';
+    });
+  });
+}
+
+
 
   // フラット展開（word × source）
   var rows = [];
