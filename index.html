@@ -1909,63 +1909,6 @@ function renderSourceResults(src, label) {
   });
 }
 
-
-
-  // フラット展開（word × source）
-  var rows = [];
-  words.forEach(function(w) {
-    var urls = w.urls || {};
-    Object.keys(urls).forEach(function(src) {
-      var url = urls[src]; if (!url) return;
-      rows.push({ word: w.word, reading: w.reading, cefr: w.cefr, category: w.category, note: w.note, src: src, url: url, _wordIndex: w._index });
-    });
-  });
-
-  var html =
-    '<div class="cat-result-title">' +
-      esc(category) +
-      ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' + rows.length.toLocaleString() + '件</span>' +
-    '</div>' +
-    '<div class="result-list">' +
-    rows.map(function(row, i) {
-      var label = SOURCE_LABELS[row.src] || row.src;
-      var icon  = SOURCE_EXT[row.src] ? '🔗' : '▶';
-      var isFav = favSet.has(row.word);
-      return '<div class="result-row" data-catidx="' + i + '">' +
-        '<div class="row-word-wrap">' +
-          '<span class="row-word">' + esc(row.word) + '</span>' +
-          '<span class="row-reading">' + esc(row.reading) + '</span>' +
-        '</div>' +
-        '<div class="row-src">' +
-          '<span class="row-src-icon">' + icon + '</span>' +
-          '<span class="row-src-label">' + esc(label) + '</span>' +
-        '</div>' +
-        '<button class="row-fav ' + (isFav ? 'active' : '') + '" data-word="' + esc(row.word) + '">' + (isFav ? '⭐' : '☆') + '</button>' +
-      '</div>';
-    }).join('') +
-    '</div>';
-
-  el.innerHTML = html;
-
-  // イベント登録
-  el.querySelectorAll('.result-row').forEach(function(rowEl) {
-    rowEl.addEventListener('click', function(e) {
-      if (e.target.classList.contains('row-fav')) return;
-      openSheet(rows[+rowEl.dataset.catidx]);
-    });
-  });
-  el.querySelectorAll('.row-fav').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      var word = btn.dataset.word;
-      favSet.has(word) ? favSet.delete(word) : favSet.add(word);
-      saveFavs(); updateStats();
-      btn.classList.toggle('active', favSet.has(word));
-      btn.textContent = favSet.has(word) ? '⭐' : '☆';
-    });
-  });
-}
-
 // ═══════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
 var channelList  = [];
