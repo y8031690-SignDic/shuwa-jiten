@@ -315,9 +315,11 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 }
 .cat-results-area { margin-top: 4px; }
 .cat-result-title {
-  font-size: 13px; font-weight: 700; color: var(--forest);
+  font-size: 13px; font-weight: 700; color: var(--white);
   margin: 4px 0 8px; display: flex; align-items: center; gap: 6px;
-}
+  background: var(--forest);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);}
 
 /* 初期メッセージ */
 .cat-placeholder {
@@ -1908,7 +1910,7 @@ function renderCatResults(category) {
   var html =
     '<div class="cat-result-title">' +
       esc(category) +
-      ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' + rows.length.toLocaleString() + '件</span>' +
+      ' <span style="font-family:var(--font-mono);color:rgba(255,255,255,0.7);font-size:12px;font-weight:400">' + rows.length.toLocaleString() + '件</span>' +
     '</div>' +
     '<div class="result-list">' +
     rows.map(function(row, i) {
@@ -1972,7 +1974,7 @@ function renderSourceResults(src, label) {
 
   var html =
     '<div class="cat-result-title">' + esc(label) +
-    ' <span style="font-family:var(--font-mono);color:var(--ink-muted);font-size:12px;font-weight:400">' +
+    ' <span style="font-family:var(--font-mono);color:rgba(255,255,255,0.7);font-size:12px;font-weight:400">' +
     rows.length.toLocaleString() + '件</span></div>' +
     '<div class="result-list">' +
     rows.map(function(row, i) {
