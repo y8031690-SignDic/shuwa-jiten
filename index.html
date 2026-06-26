@@ -1165,7 +1165,7 @@ function renderPage() {
   }
 
   var meta = '<div class="result-meta"><strong>'+total.toLocaleString()+'</strong> 件（'+currentPage+'/'+pages+'ページ）</div>';
-  var rows = slice.map(rowHTML).join('');
+  var rows = slice.map(function(row, i) { return rowHTML(row, start + i); }).join('');
   area.innerHTML = meta + '<div class="result-list">'+rows+'</div>';
 
   // イベント登録
@@ -1202,7 +1202,7 @@ function rowHTML(row, idx) {
   var isExt  = !!SOURCE_EXT[row.src];
   var icon   = isExt?'🔗':'▶';
   var isFav  = favSet.has(row.word);
-  return '<div class="result-row" data-idx="'+(flatRows.indexOf(row))+'">'+
+  return '<div class="result-row" data-idx="'+idx+'">'+
     '<div class="row-word-wrap">'+
       '<span class="row-word">'+esc(row.word)+'</span>'+
       '<span class="row-reading">'+esc(row.reading)+'</span>'+
@@ -1645,7 +1645,6 @@ function renderKanaResults(kana, type) {
       // ★ gasCall を追加（source付き）
       var query = w.word;  // 検索ワード
       var count = Object.keys(urls).length;  // ヒット件数
-      gasCall('logSearch', [query, count, firstSrc], function(){}, function(){});
 
       openSheet({
         word:w.word,
@@ -2020,7 +2019,7 @@ var refLoaded    = false;
 
 function renderRefPage() {
   if(refLoaded){ buildRefHTML(); return; }
-  var cached = Cache.get('shuwa-v9-ref');
+  var cached = Cache.get('shuwa-v10-ref');
   if(cached){ channelList=cached; refLoaded=true; buildRefHTML(); return; }
 
   document.getElementById('refList').innerHTML =
@@ -2029,7 +2028,7 @@ function renderRefPage() {
   gasCall('getChannelList',[],
     function(data){
       channelList = data||[];
-      Cache.set('shuwa-v9-ref', channelList);
+      Cache.set('shuwa-v10-ref', channelList);
       refLoaded = true;
       buildRefHTML();
     },
@@ -2236,6 +2235,7 @@ function showTodaysSign() {
   var candidates = allWords.filter(function(w) {
     return EXCLUDE_CATS.indexOf(w.category) === -1 &&
            EXCLUDE_SECTIONS.indexOf(w.section) === -1;
+           Object.keys(w.urls || {}).length > 0;
   });
   if (!candidates.length) candidates = allWords;
 
