@@ -1463,7 +1463,7 @@ function showPage(page){
       document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
       var pageEl = document.getElementById('page-admin');
       if(pageEl) pageEl.classList.add('active');
-      populateSourceSelect();
+ 
       renderEditList();
       window.scrollTo(0,0);
     });
