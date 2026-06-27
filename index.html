@@ -866,7 +866,7 @@ var SOURCE_LABELS = {
   'signs-io':'Signs I/O','otokogumi':'男組',
   'sunada-atom':'砂田アトム','imai-akito':'今井彰人',
   'ezoe-satoshi':'江副悟史','shuwa-bunka-mura':'手話文化村',
-  'araki-hirohiko':'荒木宏彦','yoshiyama':'ﾔﾏﾖｼ',
+  'araki-hirohiko':'荒木宏彦','yoshiyama':'ﾔﾏ ﾖｼ',
   'mimisuppo':'mimisuppo','asaka-shakyo':'朝霞社協',
   'accessible-cancer':'アクセシブルながん情報',
   'deaf-highschool':'ろう難聴高校生塾','mede-kiku-tv':'目で聴くテレビ',
@@ -1333,7 +1333,8 @@ document.getElementById('sheetFavBtn').addEventListener('click',function(){
   var adding = !favSet.has(word);
   favSet.has(word)?favSet.delete(word):favSet.add(word);
   saveFavs(); updateSheetBtns(word); updateStats();
-  showToast(favSet.has(word)?'📖 マイ単語帳に追加しました':'マイ単語帳から削除しました');
+  showToast(adding ? '📖 マイ単語帳に追加しました' : 'マイ単語帳から削除しました');
+  gasCall('logFavorite', [{ word: word, action: adding ? 'add' : 'remove' }], function(){}, function(){});
   document.querySelectorAll('.row-fav[data-word="'+esc(word)+'"]').forEach(function(btn){
     btn.classList.toggle('active',favSet.has(word));
     btn.textContent=favSet.has(word)?'⭐':'☆';
@@ -1642,9 +1643,6 @@ function renderKanaResults(kana, type) {
       var urls = w.urls||{};
       var firstSrc = Object.keys(urls)[0];
       if(!firstSrc) return;
-      // ★ gasCall を追加（source付き）
-      var query = w.word;  // 検索ワード
-      var count = Object.keys(urls).length;  // ヒット件数
 
       openSheet({
         word:w.word,
@@ -2234,10 +2232,12 @@ function showTodaysSign() {
   var EXCLUDE_SECTIONS = ['例文', '語源の話'];
   var candidates = allWords.filter(function(w) {
     return EXCLUDE_CATS.indexOf(w.category) === -1 &&
-           EXCLUDE_SECTIONS.indexOf(w.section) === -1;
+           EXCLUDE_SECTIONS.indexOf(w.section) === -1 &&
            Object.keys(w.urls || {}).length > 0;
-  });
-  if (!candidates.length) candidates = allWords;
+  });                             
+  if (!candidates.length) candidates = allWords.filter(function(w) {
+    return Object.keys(w.urls || {}).length > 0;
+  }); 
 
   // 日付シードで全員同じ単語
   var now  = new Date();
