@@ -576,46 +576,19 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
     </div>
   </div>
 
+  <!-- 行動統計カードの直後に追加 -->
+  <div class="admin-card">
+    <div class="admin-title">📖 マイ単語帳統計</div>
+    <div id="favStatsArea">
+      <button class="stats-load-btn" id="favStatsLoadBtn">マイ単語帳統計を読み込む</button>
+    </div>
+  </div>
+
   <!-- 単語編集 -->
   <div class="admin-card">
     <div class="admin-title">✏️ 単語を編集</div>
     <input class="form-ctrl" id="adminSearch" placeholder="単語を検索…" style="margin-bottom:10px">
     <div class="edit-result-list" id="editList"></div>
-  </div>
-
-  <!-- カテゴリ辞書育成ツール -->
-  <div class="admin-card" id="categoryBuilderCard">
-    <div class="admin-title">🤖 カテゴリ辞書育成（AI自動分類）</div>
-    <p style="font-size:12px;color:var(--ink-muted);margin-bottom:12px;line-height:1.7;">「その他」単語をClaudeで分類し、カテゴリ辞書に追記します。<br>完了後は reclassifyUncategorizedOnly を実行してください。</p>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
-      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center;">
-        <div style="font-size:11px;color:var(--ink-muted);margin-bottom:4px;">対象単語数</div>
-        <div style="font-size:22px;font-weight:900;font-family:var(--font-mono);color:var(--forest);" id="cb-total">—</div>
-      </div>
-      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center;">
-        <div style="font-size:11px;color:var(--ink-muted);margin-bottom:4px;">処理済み</div>
-        <div style="font-size:22px;font-weight:900;font-family:var(--font-mono);color:var(--forest);" id="cb-done">0</div>
-      </div>
-      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center;">
-        <div style="font-size:11px;color:var(--ink-muted);margin-bottom:4px;">辞書に追記</div>
-        <div style="font-size:22px;font-weight:900;font-family:var(--font-mono);color:var(--forest);" id="cb-added">0</div>
-      </div>
-    </div>
-
-    <div style="background:var(--bg);border-radius:var(--radius-sm);height:6px;overflow:hidden;margin-bottom:10px;">
-      <div id="cb-bar" style="height:100%;width:0%;background:var(--lime);transition:width 0.3s;"></div>
-    </div>
-
-    <div id="cb-log" style="background:var(--bg);border-radius:var(--radius-sm);padding:8px 12px;font-size:11px;font-family:var(--font-mono);min-height:60px;max-height:160px;overflow-y:auto;margin-bottom:12px;color:var(--ink-muted);line-height:1.8;">
-      準備完了。「開始」を押してください。
-    </div>
-
-    <div style="display:flex;gap:8px;">
-      <button class="submit-btn" id="cb-btn-start" onclick="cbStart()" style="flex:1;">▶ 開始</button>
-      <button class="submit-btn" id="cb-btn-stop" onclick="cbStop()" disabled style="flex:1;opacity:0.4;background:var(--ink-muted);">■ 停止</button>
-      <button class="submit-btn" onclick="cbReclassify()" style="flex:1;background:var(--teal);">🔄 reclassifyUncategorizedOnly</button>
-    </div>
   </div>
 </div>
 
@@ -2181,13 +2154,45 @@ function buildStatsHTML(data) {
 //  JS: 行動統計表示
 // ═══════════════════════════════════════════════════════════════
 document.getElementById('actionStatsLoadBtn').addEventListener('click', function() {
-  var btn = document.getElementById('actionStatsLoadBtn');
-  btn.textContent = '読み込み中…'; btn.disabled = true;
+  var btn = this;
+  btn.disabled = true; btn.textContent = '読み込み中…';
   gasCall('getActionStats', [], function(data) {
     buildActionStatsHTML(data);
-  }, function(err) {
-    document.getElementById('actionStatsArea').innerHTML =
-      '<div class="error-banner show">❌ ' + (err.message||String(err)) + '</div>';
+  }, function() {
+    btn.disabled = false; btn.textContent = '行動統計を読み込む';
+  });
+});
+
+document.getElementById('favStatsLoadBtn').addEventListener('click', function() {
+  this.disabled = true;
+  this.textContent = '読み込み中…';
+  var self = this;
+  gasCall('getFavoriteStats', [], function(rows) {
+    var area = document.getElementById('favStatsArea');
+    if (!rows || !rows.length) {
+      area.innerHTML = '<p style="font-size:13px;color:var(--ink-muted);">まだデータがありません</p>';
+      return;
+    }
+    var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;">'
+      + '<tr style="background:var(--forest);color:#fff;">'
+      + '<th style="padding:7px 10px;text-align:left;">単語</th>'
+      + '<th style="padding:7px 10px;text-align:center;">追加</th>'
+      + '<th style="padding:7px 10px;text-align:center;">削除</th>'
+      + '<th style="padding:7px 10px;text-align:center;">正味</th>'
+      + '</tr>';
+    rows.forEach(function(r, i) {
+      var bg = i % 2 === 0 ? 'var(--bg)' : 'var(--white)';
+      html += '<tr style="background:' + bg + ';">'
+        + '<td style="padding:7px 10px;font-weight:700;">' + esc(r.word) + '</td>'
+        + '<td style="padding:7px 10px;text-align:center;color:var(--amber);">+' + r.add + '</td>'
+        + '<td style="padding:7px 10px;text-align:center;color:var(--ink-muted);">-' + r.remove + '</td>'
+        + '<td style="padding:7px 10px;text-align:center;font-weight:700;color:var(--forest);">★' + r.net + '</td>'
+        + '</tr>';
+    });
+    area.innerHTML = html + '</table>';
+  }, function() {
+    self.disabled = false;
+    self.textContent = 'マイ単語帳統計を読み込む';
   });
 });
 
@@ -2291,206 +2296,6 @@ function showTodaysSign() {
 init();
 initKanaGrid();
 
-// ═══════════════════════════════════════
-//  カテゴリ辞書育成ツール（管理者ページ）
-// ═══════════════════════════════════════
-(function() {
-  var CB_BATCH = 20;
-  var CB_RUNNING = false;
-  var CB_WORDS = [];
-  var CB_IDX = 0;
-  var CB_ADDED = 0;
-
-var CATEGORIES = [
-    {cat:'挨拶・会話表現',        group:'🗣️ 言語',     cefr:'A1'},
-    {cat:'気持ち・感情',          group:'🗣️ 言語',     cefr:'B1'},
-    {cat:'言語・コミュニケーション',group:'🗣️ 言語',   cefr:'A2'},
-    {cat:'副詞・機能語',          group:'🗣️ 言語',     cefr:'B1'},
-    {cat:'指文字',      group:'🗣️ 言語',     cefr:'A1'},
-    {cat:'家族・親族',            group:'👥 人・関係',  cefr:'A2'},
-    {cat:'人間関係・社会生活',    group:'👥 人・関係',  cefr:'B1'},
-    {cat:'人の様子・性格',        group:'👥 人・関係',  cefr:'B1'},
-    {cat:'人名・サインネーム',    group:'👥 人・関係',  cefr:'B2'},
-    {cat:'身体・健康',            group:'🏥 健康・医療', cefr:'A1'},
-    {cat:'医療・治療',            group:'🏥 健康・医療', cefr:'B2'},
-    {cat:'福祉・支援制度',        group:'🏥 健康・医療', cefr:'B2'},
-    {cat:'食べ物・飲み物・料理',  group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'衣服・ファッション',    group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'住まい・家具・家電',    group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'買い物・お金・家計',    group:'🏠 日常生活',  cefr:'A2'},
-    {cat:'学校・教育・学習',      group:'🏫 学び・仕事', cefr:'B1'},
-    {cat:'仕事・職業・職場',      group:'🏫 学び・仕事', cefr:'B1'},
-    {cat:'IT・デジタル',          group:'🏫 学び・仕事', cefr:'B2'},
-    {cat:'科学・技術',            group:'🏫 学び・仕事', cefr:'B2'},
-    {cat:'法律・政治・行政',      group:'⚖️ 社会',      cefr:'B2'},
-    {cat:'人権・多様性・共生',    group:'⚖️ 社会',      cefr:'C1'},
-    {cat:'社会問題・事件・犯罪',  group:'⚖️ 社会',      cefr:'B2'},
-    {cat:'地名・国名・地域',      group:'🌍 自然・世界', cefr:'B2'},
-    {cat:'気象・自然災害・防災',  group:'🌍 自然・世界', cefr:'B1'},
-    {cat:'自然・地形・環境',      group:'🌍 自然・世界', cefr:'B1'},
-    {cat:'動物・植物',            group:'🌍 自然・世界', cefr:'A2'},
-    {cat:'スポーツ・運動',        group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'趣味・芸術・創作',      group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'遊び・ゲーム・娯楽',    group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'行事・冠婚葬祭',        group:'🎉 文化・活動', cefr:'B1'},
-    {cat:'乗り物・交通',          group:'🚃 場所・移動', cefr:'A2'},
-    {cat:'場所・施設・建物',      group:'🚃 場所・移動', cefr:'A2'},
-    {cat:'数字・量・単位',        group:'🔢 基礎語彙',  cefr:'A1'},
-    {cat:'時間・時刻・曜日',      group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'日付・月・年・季節',    group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'色・形・大きさ',        group:'🔢 基礎語彙',  cefr:'A1'},
-    {cat:'動作・行動を表す語',    group:'🔢 基礎語彙',  cefr:'A2'},
-    {cat:'状態・形容を表す語',    group:'🔢 基礎語彙',  cefr:'B1'},
-    {cat:'位置・方向',            group:'🔢 基礎語彙',  cefr:'A1'},
-    {cat:'概念・抽象語',          group:'🔢 基礎語彙',  cefr:'B2'},
-    {cat:'歴史・時代・古語',      group:'📚 歴史',      cefr:'C1'},
-    {cat:'その他',                group:'❓ その他',    cefr:'A2'},
-  ];
-  var CAT_NAMES = CATEGORIES.map(function(c){ return c.cat; });
-
-  function cbLog(msg) {
-    var el = document.getElementById('cb-log');
-    if (!el) return;
-    el.innerHTML += msg + '<br>';
-    el.scrollTop = el.scrollHeight;
-  }
-
-  function cbUpdateStats(done, added, total) {
-    if (document.getElementById('cb-total')) document.getElementById('cb-total').textContent = total >= 0 ? total : '—';
-    if (document.getElementById('cb-done'))  document.getElementById('cb-done').textContent  = done;
-    if (document.getElementById('cb-added')) document.getElementById('cb-added').textContent = added;
-    if (total > 0 && document.getElementById('cb-bar')) {
-      document.getElementById('cb-bar').style.width = Math.round(done / total * 100) + '%';
-    }
-  }
-
-  function cbSetButtons(running) {
-    var s = document.getElementById('cb-btn-start');
-    var t = document.getElementById('cb-btn-stop');
-    if (s) { s.disabled = running; s.style.opacity = running ? '0.4' : '1'; }
-    if (t) { t.disabled = !running; t.style.opacity = running ? '1' : '0.4'; }
-  }
-
-  async function cbFetchUncategorized() {
-    var url = GAS_URL + '?token=' + encodeURIComponent(ADMIN_TOKEN) + '&action=getUncategorized';
-    var res  = await fetch(url);
-    var data = await res.json();
-    if (data.status !== 'ok') throw new Error(data.message || '取得失敗');
-    return data.data;
-  }
-
-  async function cbClassify(words) {
-    var prompt = '以下の日本語単語を、指定カテゴリのいずれか1つに分類してください。\nJSON配列のみ返してください。説明不要。\n\nカテゴリ:\n' + CAT_NAMES.join('、') + '\n\n単語:\n' + words.map(function(w,i){ return i+': '+w; }).join('\n') + '\n\n回答例: ["カテゴリA","その他","カテゴリB"]';
-    // ※ Anthropic APIキーはブラウザに置かず、GAS側(Script Properties)で保管・利用する。
-    //   ここではGASに 'classifyWords' アクションとしてプロンプトを渡すだけ。
-    var res  = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'classifyWords', args: [prompt], token: ADMIN_TOKEN })
-    });
-    var data = await res.json();
-    if (data.error) { cbLog('  ⚠️ classifyWords エラー: ' + data.error); return words.map(function(){ return 'その他'; }); }
-    var text = (data.result || '[]').replace(/```json|```/g,'').trim();
-    try {
-      var arr = JSON.parse(text);
-      if (Array.isArray(arr) && arr.length === words.length) return arr;
-    } catch(e) {}
-    return words.map(function(){ return 'その他'; });
-  }
-
-  async function cbWriteDict(entries) {
-    var res  = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'addCategoryKeywords', args: [entries], token: ADMIN_TOKEN })
-    });
-    var data = await res.json();
-    return (data.result && data.result.added) || 0;
-  }
-
-  window.cbStart = async function() {
-    if (CB_RUNNING) return;
-    CB_RUNNING = true;
-    cbSetButtons(true);
-    document.getElementById('cb-log').innerHTML = '';
-    CB_IDX = 0; CB_ADDED = 0;
-
-    try {
-      cbLog('GASから「その他」単語を取得中…');
-      CB_WORDS = await cbFetchUncategorized();
-      cbLog('取得完了: ' + CB_WORDS.length + '件');
-      cbUpdateStats(0, 0, CB_WORDS.length);
-
-      if (CB_WORDS.length === 0) {
-        cbLog('「その他」の単語はありません ✅');
-        cbSetButtons(false); CB_RUNNING = false; return;
-      }
-
-      while (CB_RUNNING && CB_IDX < CB_WORDS.length) {
-        var batch = CB_WORDS.slice(CB_IDX, CB_IDX + CB_BATCH);
-        var words = batch.map(function(w){ return w.word; });
-        cbLog('[' + (CB_IDX+1) + '〜' + (CB_IDX+batch.length) + '/' + CB_WORDS.length + '] 分類中…');
-
-        var cats = await cbClassify(words);
-
-        var catMap = {};
-        words.forEach(function(word, i) {
-          var cat = cats[i];
-          if (!cat || cat === 'その他') return;
-          if (!catMap[cat]) catMap[cat] = [];
-          catMap[cat].push(word);
-        });
-
-        var entries = Object.keys(catMap).map(function(cat) {
-          var info = CATEGORIES.find(function(c){ return c.cat === cat; }) || {group:'❓ その他', cefr:'A2'};
-          return { group: info.group, category: cat, keywords: catMap[cat], cefrDefault: info.cefr };
-        });
-
-        if (entries.length > 0) {
-          var added = await cbWriteDict(entries);
-          CB_ADDED += added;
-          var preview = Object.keys(catMap).map(function(c){ return c+':'+catMap[c].length+'語'; }).join(', ');
-          cbLog('  → 追記: ' + added + '語 (' + preview + ')');
-        } else {
-          cbLog('  → 分類なし');
-        }
-
-        CB_IDX += batch.length;
-        cbUpdateStats(CB_IDX, CB_ADDED, CB_WORDS.length);
-        await new Promise(function(r){ setTimeout(r, 600); });
-      }
-
-      if (CB_IDX >= CB_WORDS.length) {
-        cbLog('✅ 完了！ 辞書に合計' + CB_ADDED + '語を追記しました。');
-        cbLog('次: reclassifyUncategorizedOnly を実行してください。');
-      } else {
-        cbLog('⏸ 停止しました。再度「開始」で続きから再開できます。');
-      }
-    } catch(err) {
-      cbLog('❌ エラー: ' + err.message);
-    }
-
-    CB_RUNNING = false;
-    cbSetButtons(false);
-  };
-
-  window.cbStop = function() { CB_RUNNING = false; };
-
-  window.cbReclassify = async function() {
-    cbLog('reclassifyUncategorizedOnly 実行中…（時間がかかります）');
-    try {
-      var res  = await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'reclassifyUncategorizedOnly', args: [], token: ADMIN_TOKEN })
-      });
-      var data = await res.json();
-      cbLog(data.result ? '✅ reclassifyUncategorizedOnly 完了！' : '⚠️ 応答: ' + JSON.stringify(data));
-    } catch(err) {
-      cbLog('❌ エラー: ' + err.message);
-    }
-  };
-})();
 
 </script>
 </body>
