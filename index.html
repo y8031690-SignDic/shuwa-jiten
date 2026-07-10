@@ -2238,8 +2238,9 @@ function showTodaysSign() {
   var candidates = allWords.filter(function(w) {
     return EXCLUDE_CATS.indexOf(w.category) === -1 &&
            EXCLUDE_SECTIONS.indexOf(w.section) === -1 &&
+           (w.source || '').indexOf('tsukuba_') !== 0 &&   // ← 筑波ソースを除外
            Object.keys(w.urls || {}).length > 0;
-  });                             
+  });                            
   if (!candidates.length) candidates = allWords.filter(function(w) {
     return Object.keys(w.urls || {}).length > 0;
   }); 
