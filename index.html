@@ -250,7 +250,6 @@ textarea.form-ctrl { min-height: 70px; resize: vertical; }
 .channel-card:hover { border-left-color:var(--forest); box-shadow:var(--shadow-md); }
 .channel-name { font-size:14px; font-weight:700; font-family:var(--font-display); color:var(--forest); }
 .channel-op   { font-size:11px; color:var(--ink-muted); margin-top:2px; }
-.channel-cefr { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; background:var(--lime-light); color:var(--forest); font-family:var(--font-mono); border:1px solid var(--line); margin-top:6px; }
 .channel-note { font-size:12px; color:var(--ink-mid); margin-top:6px; line-height:1.6; }
 /* ─ 検索タブ ─ */
 .search-tabs { display: flex; gap: 0; margin: 12px 0 0; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); background: var(--white); box-shadow: var(--shadow); }
@@ -1239,7 +1238,6 @@ function openSheet(row) {
 
   // バッジ
   var pills = '';
-  if(row.cefr)     pills += '<span class="pill">'+esc(row.cefr)+'</span>';
   if(row.category) pills += '<span class="pill cat">'+esc(row.category)+'</span>';
   document.getElementById('sheetPills').innerHTML = pills;
 
@@ -2038,12 +2036,10 @@ function buildRefHTML() {
       var name  = ch['name（名称）']||'';
       var op    = ch['operator（運営）']||'';
       var url   = ch['url（URL）']||'#';
-      var cefr  = ch['cefr（レベル）']||'';
       var note  = ch['note（説明）']||'';
       html += '<a class="channel-card" href="'+esc(url)+'" target="_blank" rel="noopener">'+
         '<div class="channel-name">'+esc(name)+'</div>'+
         (op?'<div class="channel-op">'+esc(op)+'</div>':'')+
-        (cefr?'<span class="channel-cefr">'+esc(cefr)+'</span>':'')+
         (note?'<div class="channel-note">'+esc(note)+'</div>':'')+
         '</a>';
     });
